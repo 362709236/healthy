@@ -17,8 +17,6 @@ public class StandardIntakeService {
     @Autowired
     OccupationMapper occupationMapper;
 
-
-
     /*
     * 输入：consumer类
     * 输出：营养素列表
