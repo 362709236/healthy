@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.cch.healthy.dao.SetmealInfomationMapper" >
+  <resultMap id="BaseResultMap" type="cn.cch.healthy.model.SetmealInfomation" >
+    <id column="SM_id" property="smId" jdbcType="INTEGER" />
+    <result column="SM_name" property="smName" jdbcType="VARCHAR" />
+    <result column="SI_fat" property="siFat" jdbcType="DOUBLE" />
+    <result column="SI_energy" property="siEnergy" jdbcType="DOUBLE" />
+    <result column="SI_portein" property="siPortein" jdbcType="DOUBLE" />
+    <result column="SI_vitamin_A" property="siVitaminA" jdbcType="INTEGER" />
+    <result column="SI_vitamin_B_1" property="siVitaminB1" jdbcType="INTEGER" />
+    <result column="SI_vitamin_B_2" property="siVitaminB2" jdbcType="INTEGER" />
+    <result column="SI_vitamin_C" property="siVitaminC" jdbcType="INTEGER" />
+    <result column="SI_vitamin_E" property="siVitaminE" jdbcType="INTEGER" />
+    <result column="SI_Mg" property="siMg" jdbcType="INTEGER" />
+    <result column="SI_Ca" property="siCa" jdbcType="INTEGER" />
+    <result column="SI_Zn" property="siZn" jdbcType="INTEGER" />
+    <result column="SI_Fe" property="siFe" jdbcType="INTEGER" />
+    <result column="SI_cholesterol" property="siCholesterol" jdbcType="INTEGER" />
+    <result column="Right_time" property="rightTime" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    SM_id, SM_name, SI_fat, SI_energy, SI_portein, SI_vitamin_A, SI_vitamin_B_1, SI_vitamin_B_2, 
+    SI_vitamin_C, SI_vitamin_E, SI_Mg, SI_Ca, SI_Zn, SI_Fe, SI_cholesterol, Right_time
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from setmealinfomation
+    where SM_id = #{smId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByTime" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from setmealinfomation
+    where Right_time = #{rightTime,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from setmealinfomation
+    where SM_id = #{smId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.cch.healthy.model.SetmealInfomation" >
+    <selectKey resultType="java.lang.Integer" keyProperty="smId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into setmealinfomation (SM_name, SI_fat, SI_energy, 
+      SI_portein, SI_vitamin_A, SI_vitamin_B_1, 
+      SI_vitamin_B_2, SI_vitamin_C, SI_vitamin_E, 
+      SI_Mg, SI_Ca, SI_Zn, SI_Fe, 
+      SI_cholesterol, Right_time)
+    values (#{smName,jdbcType=VARCHAR}, #{siFat,jdbcType=DOUBLE}, #{siEnergy,jdbcType=DOUBLE}, 
+      #{siPortein,jdbcType=DOUBLE}, #{siVitaminA,jdbcType=INTEGER}, #{siVitaminB1,jdbcType=INTEGER}, 
+      #{siVitaminB2,jdbcType=INTEGER}, #{siVitaminC,jdbcType=INTEGER}, #{siVitaminE,jdbcType=INTEGER}, 
+      #{siMg,jdbcType=INTEGER}, #{siCa,jdbcType=INTEGER}, #{siZn,jdbcType=INTEGER}, #{siFe,jdbcType=INTEGER}, 
+      #{siCholesterol,jdbcType=INTEGER}, #{rightTime,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.cch.healthy.model.SetmealInfomation" >
+    <selectKey resultType="java.lang.Integer" keyProperty="smId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into setmealinfomation
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="smName != null" >
+        SM_name,
+      </if>
+      <if test="siFat != null" >
+        SI_fat,
+      </if>
+      <if test="siEnergy != null" >
+        SI_energy,
+      </if>
+      <if test="siPortein != null" >
+        SI_portein,
+      </if>
+      <if test="siVitaminA != null" >
+        SI_vitamin_A,
+      </if>
+      <if test="siVitaminB1 != null" >
+        SI_vitamin_B_1,
+      </if>
+      <if test="siVitaminB2 != null" >
+        SI_vitamin_B_2,
+      </if>
+      <if test="siVitaminC != null" >
+        SI_vitamin_C,
+      </if>
+      <if test="siVitaminE != null" >
+        SI_vitamin_E,
+      </if>
+      <if test="siMg != null" >
+        SI_Mg,
+      </if>
+      <if test="siCa != null" >
+        SI_Ca,
+      </if>
+      <if test="siZn != null" >
+        SI_Zn,
+      </if>
+      <if test="siFe != null" >
+        SI_Fe,
+      </if>
+      <if test="siCholesterol != null" >
+        SI_cholesterol,
+      </if>
+      <if test="rightTime != null" >
+        Right_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="smName != null" >
+        #{smName,jdbcType=VARCHAR},
+      </if>
+      <if test="siFat != null" >
+        #{siFat,jdbcType=DOUBLE},
+      </if>
+      <if test="siEnergy != null" >
+        #{siEnergy,jdbcType=DOUBLE},
+      </if>
+      <if test="siPortein != null" >
+        #{siPortein,jdbcType=DOUBLE},
+      </if>
+      <if test="siVitaminA != null" >
+        #{siVitaminA,jdbcType=INTEGER},
+      </if>
+      <if test="siVitaminB1 != null" >
+        #{siVitaminB1,jdbcType=INTEGER},
+      </if>
+      <if test="siVitaminB2 != null" >
+        #{siVitaminB2,jdbcType=INTEGER},
+      </if>
+      <if test="siVitaminC != null" >
+        #{siVitaminC,jdbcType=INTEGER},
+      </if>
+      <if test="siVitaminE != null" >
+        #{siVitaminE,jdbcType=INTEGER},
+      </if>
+      <if test="siMg != null" >
+        #{siMg,jdbcType=INTEGER},
+      </if>
+      <if test="siCa != null" >
+        #{siCa,jdbcType=INTEGER},
+      </if>
+      <if test="siZn != null" >
+        #{siZn,jdbcType=INTEGER},
+      </if>
+      <if test="siFe != null" >
+        #{siFe,jdbcType=INTEGER},
+      </if>
+      <if test="siCholesterol != null" >
+        #{siCholesterol,jdbcType=INTEGER},
+      </if>
+      <if test="rightTime != null" >
+        #{rightTime,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.cch.healthy.model.SetmealInfomation" >
+    update setmealinfomation
+    <set >
+      <if test="smName != null" >
+        SM_name = #{smName,jdbcType=VARCHAR},
+      </if>
+      <if test="siFat != null" >
+        SI_fat = #{siFat,jdbcType=DOUBLE},
+      </if>
+      <if test="siEnergy != null" >
+        SI_energy = #{siEnergy,jdbcType=DOUBLE},
+      </if>
+      <if test="siPortein != null" >
+        SI_portein = #{siPortein,jdbcType=DOUBLE},
+      </if>
+      <if test="siVitaminA != null" >
+        SI_vitamin_A = #{siVitaminA,jdbcType=INTEGER},
+      </if>
+      <if test="siVitaminB1 != null" >
+        SI_vitamin_B_1 = #{siVitaminB1,jdbcType=INTEGER},
+      </if>
+      <if test="siVitaminB2 != null" >
+        SI_vitamin_B_2 = #{siVitaminB2,jdbcType=INTEGER},
+      </if>
+      <if test="siVitaminC != null" >
+        SI_vitamin_C = #{siVitaminC,jdbcType=INTEGER},
+      </if>
+      <if test="siVitaminE != null" >
+        SI_vitamin_E = #{siVitaminE,jdbcType=INTEGER},
+      </if>
+      <if test="siMg != null" >
+        SI_Mg = #{siMg,jdbcType=INTEGER},
+      </if>
+      <if test="siCa != null" >
+        SI_Ca = #{siCa,jdbcType=INTEGER},
+      </if>
+      <if test="siZn != null" >
+        SI_Zn = #{siZn,jdbcType=INTEGER},
+      </if>
+      <if test="siFe != null" >
+        SI_Fe = #{siFe,jdbcType=INTEGER},
+      </if>
+      <if test="siCholesterol != null" >
+        SI_cholesterol = #{siCholesterol,jdbcType=INTEGER},
+      </if>
+      <if test="rightTime != null" >
+        Right_time = #{rightTime,jdbcType=INTEGER},
+      </if>
+    </set>
+    where SM_id = #{smId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.cch.healthy.model.SetmealInfomation" >
+    update setmealinfomation
+    set SM_name = #{smName,jdbcType=VARCHAR},
+      SI_fat = #{siFat,jdbcType=DOUBLE},
+      SI_energy = #{siEnergy,jdbcType=DOUBLE},
+      SI_portein = #{siPortein,jdbcType=DOUBLE},
+      SI_vitamin_A = #{siVitaminA,jdbcType=INTEGER},
+      SI_vitamin_B_1 = #{siVitaminB1,jdbcType=INTEGER},
+      SI_vitamin_B_2 = #{siVitaminB2,jdbcType=INTEGER},
+      SI_vitamin_C = #{siVitaminC,jdbcType=INTEGER},
+      SI_vitamin_E = #{siVitaminE,jdbcType=INTEGER},
+      SI_Mg = #{siMg,jdbcType=INTEGER},
+      SI_Ca = #{siCa,jdbcType=INTEGER},
+      SI_Zn = #{siZn,jdbcType=INTEGER},
+      SI_Fe = #{siFe,jdbcType=INTEGER},
+      SI_cholesterol = #{siCholesterol,jdbcType=INTEGER},
+      Right_time = #{rightTime,jdbcType=INTEGER}
+    where SM_id = #{smId,jdbcType=INTEGER}
+  </update>
+</mapper>

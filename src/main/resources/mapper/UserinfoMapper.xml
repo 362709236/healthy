@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.cch.healthy.dao.UserinfoMapper" >
+  <resultMap id="BaseResultMap" type="cn.cch.healthy.model.Userinfo" >
+    <id column="User_id" property="userId" jdbcType="INTEGER" />
+    <result column="User_openid" property="userOpenid" jdbcType="VARCHAR" />
+    <result column="User_name" property="userName" jdbcType="VARCHAR" />
+    <result column="User_sex" property="userSex" jdbcType="VARCHAR" />
+    <result column="User_age" property="userAge" jdbcType="INTEGER" />
+    <result column="User_height" property="userHeight" jdbcType="DOUBLE" />
+    <result column="User_weight" property="userWeight" jdbcType="DOUBLE" />
+    <result column="User_birthday" property="userBirthday" jdbcType="TIME" />
+    <result column="User_ccupation" property="userCcupation" jdbcType="VARCHAR" />
+    <result column="User_face_token" property="userFaceToken" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    User_id, User_openid, User_name, User_sex, User_age, User_height, User_weight, User_birthday, 
+    User_ccupation, User_face_token
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from userinfo
+    where User_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByOpenid" resultMap="BaseResultMap">
+    select * from userinfo where User_openid = #{userOpenid,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select * from userinfo
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from userinfo
+    where User_id = #{userId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.cch.healthy.model.Userinfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="userId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into userinfo (User_openid, User_name, User_sex, 
+      User_age, User_height, User_weight, 
+      User_birthday, User_ccupation, User_face_token
+      )
+    values (#{userOpenid,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{userSex,jdbcType=VARCHAR}, 
+      #{userAge,jdbcType=INTEGER}, #{userHeight,jdbcType=DOUBLE}, #{userWeight,jdbcType=DOUBLE}, 
+      #{userBirthday,jdbcType=TIME}, #{userCcupation,jdbcType=VARCHAR}, #{userFaceToken,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.cch.healthy.model.Userinfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="userId" order="AFTER" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into userinfo
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="userOpenid != null" >
+        User_openid,
+      </if>
+      <if test="userName != null" >
+        User_name,
+      </if>
+      <if test="userSex != null" >
+        User_sex,
+      </if>
+      <if test="userAge != null" >
+        User_age,
+      </if>
+      <if test="userHeight != null" >
+        User_height,
+      </if>
+      <if test="userWeight != null" >
+        User_weight,
+      </if>
+      <if test="userBirthday != null" >
+        User_birthday,
+      </if>
+      <if test="userCcupation != null" >
+        User_ccupation,
+      </if>
+      <if test="userFaceToken != null" >
+        User_face_token,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="userOpenid != null" >
+        #{userOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="userSex != null" >
+        #{userSex,jdbcType=VARCHAR},
+      </if>
+      <if test="userAge != null" >
+        #{userAge,jdbcType=INTEGER},
+      </if>
+      <if test="userHeight != null" >
+        #{userHeight,jdbcType=DOUBLE},
+      </if>
+      <if test="userWeight != null" >
+        #{userWeight,jdbcType=DOUBLE},
+      </if>
+      <if test="userBirthday != null" >
+        #{userBirthday,jdbcType=TIME},
+      </if>
+      <if test="userCcupation != null" >
+        #{userCcupation,jdbcType=VARCHAR},
+      </if>
+      <if test="userFaceToken != null" >
+        #{userFaceToken,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.cch.healthy.model.Userinfo" >
+    update userinfo
+    <set >
+      <if test="userOpenid != null" >
+        User_openid = #{userOpenid,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        User_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="userSex != null" >
+        User_sex = #{userSex,jdbcType=VARCHAR},
+      </if>
+      <if test="userAge != null" >
+        User_age = #{userAge,jdbcType=INTEGER},
+      </if>
+      <if test="userHeight != null" >
+        User_height = #{userHeight,jdbcType=DOUBLE},
+      </if>
+      <if test="userWeight != null" >
+        User_weight = #{userWeight,jdbcType=DOUBLE},
+      </if>
+      <if test="userBirthday != null" >
+        User_birthday = #{userBirthday,jdbcType=TIME},
+      </if>
+      <if test="userCcupation != null" >
+        User_ccupation = #{userCcupation,jdbcType=VARCHAR},
+      </if>
+      <if test="userFaceToken != null" >
+        User_face_token = #{userFaceToken,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where User_id = #{userId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.cch.healthy.model.Userinfo" >
+    update userinfo
+    set User_openid = #{userOpenid,jdbcType=VARCHAR},
+      User_name = #{userName,jdbcType=VARCHAR},
+      User_sex = #{userSex,jdbcType=VARCHAR},
+      User_age = #{userAge,jdbcType=INTEGER},
+      User_height = #{userHeight,jdbcType=DOUBLE},
+      User_weight = #{userWeight,jdbcType=DOUBLE},
+      User_birthday = #{userBirthday,jdbcType=TIME},
+      User_ccupation = #{userCcupation,jdbcType=VARCHAR},
+      User_face_token = #{userFaceToken,jdbcType=VARCHAR}
+    where User_id = #{userId,jdbcType=INTEGER}
+  </update>
+</mapper>
