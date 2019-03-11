@@ -9,7 +9,7 @@
     <result column="User_age" property="userAge" jdbcType="INTEGER" />
     <result column="User_height" property="userHeight" jdbcType="DOUBLE" />
     <result column="User_weight" property="userWeight" jdbcType="DOUBLE" />
-    <result column="User_birthday" property="userBirthday" jdbcType="TIME" />
+    <result column="User_birthday" property="userBirthday" jdbcType="DATE" />
     <result column="User_ccupation" property="userCcupation" jdbcType="VARCHAR" />
     <result column="User_face_token" property="userFaceToken" jdbcType="VARCHAR" />
   </resultMap>
@@ -23,7 +23,7 @@
     from userinfo
     where User_id = #{userId,jdbcType=INTEGER}
   </select>
-
+  
   <select id="selectByOpenid" resultMap="BaseResultMap">
     select * from userinfo where User_openid = #{userOpenid,jdbcType=VARCHAR}
   </select>
@@ -31,7 +31,7 @@
   <select id="selectAll" resultMap="BaseResultMap">
     select * from userinfo
   </select>
-
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from userinfo
     where User_id = #{userId,jdbcType=INTEGER}
@@ -46,7 +46,7 @@
       )
     values (#{userOpenid,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{userSex,jdbcType=VARCHAR}, 
       #{userAge,jdbcType=INTEGER}, #{userHeight,jdbcType=DOUBLE}, #{userWeight,jdbcType=DOUBLE}, 
-      #{userBirthday,jdbcType=TIME}, #{userCcupation,jdbcType=VARCHAR}, #{userFaceToken,jdbcType=VARCHAR}
+      #{userBirthday,jdbcType=DATE}, #{userCcupation,jdbcType=VARCHAR}, #{userFaceToken,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="cn.cch.healthy.model.Userinfo" >
@@ -103,7 +103,7 @@
         #{userWeight,jdbcType=DOUBLE},
       </if>
       <if test="userBirthday != null" >
-        #{userBirthday,jdbcType=TIME},
+        #{userBirthday,jdbcType=DATE},
       </if>
       <if test="userCcupation != null" >
         #{userCcupation,jdbcType=VARCHAR},
@@ -135,7 +135,7 @@
         User_weight = #{userWeight,jdbcType=DOUBLE},
       </if>
       <if test="userBirthday != null" >
-        User_birthday = #{userBirthday,jdbcType=TIME},
+        User_birthday = #{userBirthday,jdbcType=DATE},
       </if>
       <if test="userCcupation != null" >
         User_ccupation = #{userCcupation,jdbcType=VARCHAR},
@@ -154,7 +154,7 @@
       User_age = #{userAge,jdbcType=INTEGER},
       User_height = #{userHeight,jdbcType=DOUBLE},
       User_weight = #{userWeight,jdbcType=DOUBLE},
-      User_birthday = #{userBirthday,jdbcType=TIME},
+      User_birthday = #{userBirthday,jdbcType=DATE},
       User_ccupation = #{userCcupation,jdbcType=VARCHAR},
       User_face_token = #{userFaceToken,jdbcType=VARCHAR}
     where User_id = #{userId,jdbcType=INTEGER}

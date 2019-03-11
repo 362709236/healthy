@@ -15,6 +15,11 @@
     from occupation
     where Occupation_id = #{occupationId,jdbcType=INTEGER}
   </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select * from occupation
+  </select>
+
   <select id="getPressure" resultType="java.lang.Integer" parameterType="java.lang.String" >
     select
     Occupation_pressure

@@ -24,7 +24,7 @@
     function uploadPic(){
         var formData = new FormData($( "#pic" )[0]);
         $.ajax({
-            url: '/picture' ,  /*这是处理文件上传的servlet*/
+            url: '../user/uploadPic?openid=abcdef' ,  /*这是处理文件上传的servlet*/
             type: 'POST',
             data: formData,
             async: false,
@@ -33,7 +33,6 @@
             processData: false,
             success: function (returndata) {
                 alert(returndata.message)
-
             },
             error: function (returndata) {
                 alert(returndata);
