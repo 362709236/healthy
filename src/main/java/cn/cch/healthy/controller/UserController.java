@@ -1,12 +1,10 @@
 package cn.cch.healthy.controller;
 
 import cn.cch.healthy.model.Illness;
+import cn.cch.healthy.model.Occupation;
 import cn.cch.healthy.model.UserIllness;
 import cn.cch.healthy.model.Userinfo;
-import cn.cch.healthy.service.CompareImage;
-import cn.cch.healthy.service.IllnessService;
-import cn.cch.healthy.service.UserIllnessService;
-import cn.cch.healthy.service.UserinfoService;
+import cn.cch.healthy.service.*;
 import cn.cch.healthy.util.FaceUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,9 +18,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @RequestMapping("user")
@@ -40,21 +38,12 @@ public class UserController {
     @Autowired
     UserIllnessService userIllnessService;
 
-    public String insert(String openid){
-        Userinfo user = new Userinfo();
-        user.setUserOpenid(openid);
-        int end = userinfoService.insert(user);
-        if (end == 1){
-            return "成功";
-        }else{
-            return "失败";
-        }
-    }
+    @Autowired
+    OccupationService occupationService;
 
     @RequestMapping("uploadPic")
-    public String SetUserFace(@RequestParam("openid") String openid, HttpServletRequest request) throws IOException {
-        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-        MultipartFile file = multipartRequest.getFile("file");
+    public String SetUserFace(@RequestParam("openid") String openid,MultipartFile file) throws IOException {
+        System.out.println(openid);
         if (file == null || "".equals(file.getOriginalFilename())) {
             return "上传的照片为空";
         } else {
@@ -97,10 +86,21 @@ public class UserController {
 //        String token="5fa320fbf715f1b0857b555e62d52006";   //测试用
         for(int i=0;i<faceList.size();i++){
             for(int j=0;j<userList.size();j++){                 //将拍摄图片所得facetoken与用户的facetoken进行比对
+                if (userList.get(j).getUserFaceToken()==null){
+                    continue;
+                }
                 boolean isExit=FaceUtil.compare(userList.get(j).getUserFaceToken(),faceList.get(i));
                 if(isExit){
                     //推送内容
                     System.out.println("chenggong");    //测试用
+
+//                    RecommendController rc = new RecommendController();
+//                    List<Map> list = rc.recommend(userList.get(j));
+//                    if (list.size() !=0 ){
+//                        for (int l = 0;l<list.size();l++){
+//                            String Recipes_name = (String) list.get(l).get("name");
+//                        }
+//                    }
                 }
             }
 //            boolean isExit= FaceUtil.compare(token,faceList.get(i));  //测试用
@@ -110,8 +110,16 @@ public class UserController {
     }
 
     @RequestMapping("GetUserData")
-    public HashMap GetUserData(@RequestParam("openid") String openid){
+    public HashMap GetUserData(@RequestParam("openid") String openid,@RequestParam("username")String name){
+        System.out.println("进入获取信息控制器");
         Userinfo user= userinfoService.SelectByOpenid(openid);
+        if (user == null){
+            Userinfo new_user = new Userinfo();
+            new_user.setUserOpenid(openid);
+            new_user.setUserName(name);
+            userinfoService.insert(new_user);
+            user = userinfoService.SelectByOpenid(openid);
+        }
         int user_id = user.getUserId();
         List<UserIllness> UIlist = userIllnessService.SelectByUserid(user_id);
         List<String> IllnameList = new ArrayList<String>();
@@ -137,44 +145,36 @@ public class UserController {
     }
 
     @RequestMapping("updateUserInfo")
-    public String UpdateUserinfo(@RequestParam("openid") String openid,@RequestParam("username")String name,
-                                 @RequestParam("usersex") int sex_,@RequestParam("userborn") String birthday,
+    public String UpdateUserinfo(@RequestParam("openid") String openid,
+                                 @RequestParam("usersex") String sex,@RequestParam("userborn") String birthday,
                                  @RequestParam("userheight") double height,@RequestParam("userweight") double weight,
-                                 @RequestParam("occupation") String occupation){
-        // birthday  传过来的格式不知道 待定
-
+                                 @RequestParam("occupation") String occupation,@RequestParam("userills")String Illness_Str) throws ParseException {
         Userinfo user = userinfoService.SelectByOpenid(openid);
-        String sex = "";
-        if (sex_ == 0){
-            sex = "男";
-        }else if (sex_ == 1){
-            sex = "女";
-        }
-        user.setUserName(name);
+        System.out.println("进入修改信息控制器");
+        birthday = birthday.replace("/", "-");
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date birthday_date = sdf.parse(birthday);
+        int user_year = Integer.parseInt(birthday.substring(0,4));
+        int year = date.getYear()+1900;
+        int age = year - user_year + 1;
+        user.setUserAge(age);
+        user.setUserBirthday(birthday_date);
         user.setUserSex(sex);
         user.setUserHeight(height);
         user.setUserWeight(weight);
         user.setUserCcupation(occupation);
 
-        int end = userinfoService.UpdateByPrimaryKeySelective(user);
-        if (end == 1){
-            return "成功";
-        }else{
-            return "失败";
-        }
-    }
-
-    @RequestMapping("SetUserIllness")
-    public String SetUserIllness(@RequestParam("openid") String openid, @RequestParam("userills")String[] IllnessArray){
-        Userinfo user = userinfoService.SelectByOpenid(openid);
         int user_id = user.getUserId();
         List<UserIllness> old_UIlist = userIllnessService.SelectByUserid(user_id);
 
         ArrayList<Integer> insertList = new ArrayList();
         ArrayList<Integer> deleteList = new ArrayList();
         ArrayList<Integer> restList = new ArrayList();
+        HashMap<String, Object> map=new HashMap<String, Object>();
 
-        if (IllnessArray.length != 0){
+        String[] IllnessArray = Illness_Str.split(",");
+        if (!IllnessArray[0].equals("暂无")){
             for (int i = 0;i<IllnessArray.length;i++){
                 Illness ill = illnessService.SelectByIllname(IllnessArray[i]);
                 int ill_id = ill.getIllId();
@@ -182,7 +182,6 @@ public class UserController {
             }
         }else{
             userIllnessService.DeleteByUserid(user_id);
-            return "用户疾病已清空";
         }
 
         if (old_UIlist.size() != 0 && IllnessArray.length != 0){
@@ -230,12 +229,36 @@ public class UserController {
                 userIllnessService.DeleteByUserIll(UI);
             }
         }
-        return "成功！";
+
+        int end = userinfoService.UpdateByPrimaryKeySelective(user);
+
+        if (end == 1){
+//            map.put("Infomation","成功");
+//            map.put("userName",name);
+//            map.put("userSex",sex);
+//            map.put("userBirthday",birthday);
+//            map.put("userHeight",height);
+//            map.put("userWeight",weight);
+//            map.put("userCcupation",occupation);
+            return "成功";
+        }
+        map.put("Infomation","成功");
+        return "失败";
     }
 
     @RequestMapping("GetIllnessData")
     public List<Illness> GetIllnessData(){
         return illnessService.SelectAll();
+    }
+
+    @RequestMapping("GetOccupation")
+    public List<Occupation> GetOccupation(){
+        return occupationService.SelectAll();
+    }
+
+    @RequestMapping("ceshi")
+    public String ceshi(){
+        return "成功";
     }
 
 }

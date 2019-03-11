@@ -14,7 +14,7 @@ public class CompareImage {
 
     public List<String> test2 () throws JSONException {
 
-        File file = new File("C:\\Users\\Shinelon\\Desktop\\timg.jpg");    //假装是拍摄的图片
+        File file = new File("C:\\Users\\Administrator\\Desktop\\人脸集合\\4.jpg");    //假装是拍摄的图片
         byte[] buff = FaceUtil.getBytesFromFile(file);
         String str = FaceUtil.check(buff);
         //facetoken 集合
