@@ -1,8 +1,14 @@
 package cn.cch.healthy.model;
 
+import cn.cch.healthy.service.SetMealService;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
 public class Adward {
     int smId;
     double weight;
+    List recipeList;
     public Adward(int smId,int weight)
     {
         this.smId=smId;
@@ -27,5 +33,13 @@ public class Adward {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public List getRecipeList() {
+        return recipeList;
+    }
+
+    public void setRecipeList(List recipeList) {
+        this.recipeList = recipeList;
     }
 }

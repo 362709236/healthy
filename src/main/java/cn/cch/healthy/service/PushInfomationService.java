@@ -13,4 +13,6 @@ public class PushInfomationService {
     PushInfomationMapper mapper;
 
     public List<PushInfomation> selectRecentPush(int day){return mapper.selectRecentPush(day);}
+
+    public void addNewPush(PushInfomation pushInfomation){mapper.insert(pushInfomation);}
 }

@@ -4,12 +4,12 @@ import cn.cch.healthy.model.*;
 import cn.cch.healthy.service.*;
 import cn.cch.healthy.util.AliasUtil;
 import cn.cch.healthy.util.GetRemoveSetmeal;
+import cn.cch.healthy.util.AdwardUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
@@ -26,6 +26,8 @@ public class RecommendController {
     PushInfomationService pushInfomationService;
     @Autowired
     RecipesService recipesService;
+
+    AdwardUtil adwardUtil = new AdwardUtil();
 
     GetRemoveSetmeal getRemoveSetmeal = new GetRemoveSetmeal();
     //能量需要的上下波动范围
@@ -106,6 +108,7 @@ public class RecommendController {
                     setMealList.remove(i);
             }
         }
+
         /*
         * 使用alias算法开始抽奖
         * */
@@ -135,8 +138,17 @@ public class RecommendController {
             map.put("name",recipesService.getName(setMealContent.get(i).getRecipesId()));
             mapList.add(map);
         }
+
+        //添加推送记录
+        PushInfomation pushInfomation = new PushInfomation();
+        pushInfomation.setUserId(consumer.getUserId());
+        pushInfomation.setSmId(adwards.get(index).getSmId());
+        pushInfomation.setPiDate(new Date());
+        pushInfomation.setPiTime(time);
+        pushInfomationService.addNewPush(pushInfomation);
         return mapList;
     }
+
     /*
     * 描述：测试接口
     * */
@@ -157,6 +169,7 @@ public class RecommendController {
             Adward adward = new Adward(setMealList.get(i).getSmId());
             totalWeight+=adward.getWeight();
             adwards.add(adward);
+            adward.setRecipeList(setMealService.selectRecipeId(setMealList.get(i).getSmId()));
         }
         for(int i =0;i<adwards.size();i++)
         {

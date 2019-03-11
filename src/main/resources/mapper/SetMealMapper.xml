@@ -20,6 +20,11 @@
     select * from setmeal where SM_id = #{smId,jdbcType=INTEGER}
   </select>
 
+  <select id="selectRecipeId" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+    select Recipes_id from setmeal where SM_id = #{smId,jdbcType=INTEGER}
+  </select>
+
+
   <select id="selectByRecipesid" resultMap="BaseResultMap">
     select * from setmeal where Recipes_id = #{recipesId,jdbcType=INTEGER}
   </select>

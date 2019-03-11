@@ -23,7 +23,7 @@
     select
     <include refid="Base_Column_List" />
     from pushinfomation
-    where DATE_SUB(CURRENT_DATE,INTERVAL #{day,jdbcType=INTEGER} DAY)
+    where DATE_SUB(CURRENT_DATE,INTERVAL #{day,jdbcType=INTEGER} DAY) &lt;=  date(#{piDate,jdbcType=TIMESTAMP})
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from pushinfomation

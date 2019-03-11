@@ -16,6 +16,12 @@
     from dietrecord_sub
     where DRS_id = #{drsId,jdbcType=INTEGER}
   </select>
+  <select id="selectByDRid" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from dietrecord_sub
+    where DR_id = #{drId,jdbcType=INTEGER}
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from dietrecord_sub
     where DRS_id = #{drsId,jdbcType=INTEGER}

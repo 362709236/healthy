@@ -15,9 +15,11 @@ public class SetMealService {
 
     public int Insert(SetMeal SM){ return mapper.insert(SM); }
 
-    public List SelectBySMid(int SM_id){ return mapper.selectBySMid(SM_id); }
+    public List SelectBySMid(int smId){ return mapper.selectBySMid(smId); }
 
     public int DeleteByRecipesId(SetMeal SM){ return mapper.deleteByRecipesId(SM); }
 
     public SetMeal SelectByRecipesid(int recipesId){ return mapper.selectByRecipesid(recipesId); }
+
+    public List<Integer> selectRecipeId(int smId){return mapper.selectRecipeId(smId);}
 }

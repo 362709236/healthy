@@ -15,11 +15,14 @@ public interface SetMealMapper {
 
     SetMeal selectByPrimaryKey(Integer smNumber);
 
+
     int updateByPrimaryKeySelective(SetMeal record);
 
     int updateByPrimaryKey(SetMeal record);
 
     List selectBySMid(int id);
+
+    List<Integer> selectRecipeId(Integer smId);
 
     int deleteByRecipesId(SetMeal record);
 
