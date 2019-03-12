@@ -20,8 +20,9 @@
     select
     <include refid="Base_Column_List" />
     from dietrecord
-    where DATE_SUB(CURRENT_DATE,INTERVAL #{day,jdbcType=INTEGER} DAY) &lt;=  date(#{DR_date,jdbcType=TIMESTAMP})
-    and User_id == #{userId,jdbcType=INTEGER}
+    where date_sub(curdate(), INTERVAL #{day,jdbcType=INTEGER} DAY) &lt;= date(`DR_date`)
+    and User_id = #{userId,jdbcType=INTEGER}
+    and DR_time = #{time,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from dietrecord

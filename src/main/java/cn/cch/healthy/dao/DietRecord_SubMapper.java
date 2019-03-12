@@ -1,6 +1,7 @@
 package cn.cch.healthy.dao;
 
 import cn.cch.healthy.model.DietRecord_Sub;
+import cn.cch.healthy.model.Interest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,5 +20,5 @@ public interface DietRecord_SubMapper {
 
     int updateByPrimaryKey(DietRecord_Sub record);
 
-    List<DietRecord_Sub> selectByDRid(Integer drId);
+    List<Integer> selectByDRid(Integer drId);
 }

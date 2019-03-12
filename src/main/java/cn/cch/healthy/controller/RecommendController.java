@@ -26,6 +26,8 @@ public class RecommendController {
     PushInfomationService pushInfomationService;
     @Autowired
     RecipesService recipesService;
+    @Autowired
+    DietRecordService dietRecordService;
 
     AdwardUtil adwardUtil = new AdwardUtil();
 
@@ -190,5 +192,14 @@ public class RecommendController {
             mapList.add(map);
         }
         return mapList;
+    }
+    /*
+    * 测试接口
+    * */
+    @ResponseBody
+    @RequestMapping("/test2")
+    public List<DietRecord> test2()
+    {
+        return dietRecordService.selectRecentRecord(1,3,2);
     }
 }
