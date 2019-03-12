@@ -147,22 +147,39 @@ public class UserController {
     @RequestMapping("updateUserInfo")
     public String UpdateUserinfo(@RequestParam("openid") String openid,
                                  @RequestParam("usersex") String sex,@RequestParam("userborn") String birthday,
-                                 @RequestParam("userheight") double height,@RequestParam("userweight") double weight,
+                                 @RequestParam("userheight") String height_str,@RequestParam("userweight") String weight_str,
                                  @RequestParam("occupation") String occupation,@RequestParam("userills")String Illness_Str) throws ParseException {
         Userinfo user = userinfoService.SelectByOpenid(openid);
         System.out.println("进入修改信息控制器");
-        birthday = birthday.replace("/", "-");
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date birthday_date = sdf.parse(birthday);
-        int user_year = Integer.parseInt(birthday.substring(0,4));
-        int year = date.getYear()+1900;
-        int age = year - user_year + 1;
-        user.setUserAge(age);
-        user.setUserBirthday(birthday_date);
+
+        if(!(birthday == null || birthday.equals(""))){
+            birthday = birthday.replace("/", "-");
+            Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date birthday_date = sdf.parse(birthday);
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(birthday_date);
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            birthday_date = c.getTime();
+
+            int user_year = Integer.parseInt(birthday.substring(0,4));
+            int year = date.getYear()+1900;
+            int age = year - user_year + 1;
+            user.setUserAge(age);
+            user.setUserBirthday(birthday_date);
+        }
+
         user.setUserSex(sex);
-        user.setUserHeight(height);
-        user.setUserWeight(weight);
+
+        if (!(height_str == null || height_str.equals(""))){
+            double height = Double.valueOf(height_str);
+            user.setUserHeight(height);
+        }
+        if (!(weight_str == null || weight_str.equals(""))){
+            double weight = Double.valueOf(weight_str);
+            user.setUserWeight(weight);
+        }
         user.setUserCcupation(occupation);
 
         int user_id = user.getUserId();
@@ -257,7 +274,18 @@ public class UserController {
     }
 
     @RequestMapping("ceshi")
-    public String ceshi(){
+    public String ceshi(@RequestParam("openid") String openid){
+        if(openid==null||openid.equals("")){
+            System.out.println("ssss");
+        }else{
+            double dou_openid = Double.valueOf(openid);
+            System.out.println(dou_openid);
+        }
+//        if (){
+//            System.out.println("ssss");
+//        }
+
+        System.out.println(openid);
         return "成功";
     }
 

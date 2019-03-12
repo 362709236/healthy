@@ -55,6 +55,12 @@ public class RecommendController {
             time = 2;
         else
             time = 3;
+
+        //若用户没有填写性别和年龄   就无法推送
+        if (consumer.getUserSex() == null || consumer.getUserAge() == null){
+            return null;
+        }
+
         StandardIntake intake = standardIntakeService.getStandardIntake(consumer);
         List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(time);
 

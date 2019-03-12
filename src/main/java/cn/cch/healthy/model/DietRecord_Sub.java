@@ -1,15 +1,19 @@
 package cn.cch.healthy.model;
 
-import java.util.Date;
-
 public class DietRecord_Sub {
+    private Integer drsId;
+
     private Integer drId;
 
-    private Integer userId;
+    private Integer recipesId;
 
-    private Date drDate;
+    public Integer getDrsId() {
+        return drsId;
+    }
 
-    private Integer drTime;
+    public void setDrsId(Integer drsId) {
+        this.drsId = drsId;
+    }
 
     public Integer getDrId() {
         return drId;
@@ -19,27 +23,11 @@ public class DietRecord_Sub {
         this.drId = drId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Integer getRecipesId() {
+        return recipesId;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Date getDrDate() {
-        return drDate;
-    }
-
-    public void setDrDate(Date drDate) {
-        this.drDate = drDate;
-    }
-
-    public Integer getDrTime() {
-        return drTime;
-    }
-
-    public void setDrTime(Integer drTime) {
-        this.drTime = drTime;
+    public void setRecipesId(Integer recipesId) {
+        this.recipesId = recipesId;
     }
 }
