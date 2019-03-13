@@ -26,7 +26,7 @@ public class StandardIntakeService {
         int age = user.getUserAge();
         String occupation = user.getUserCcupation();
         int pressure = occupationMapper.getPressure(occupation);
-        if (user.getUserSex().equals("1")) {
+        if (user.getUserSex().equals("男")) {
             if (age <= 10) {
                 StandardIntake intake = new StandardIntake(standardIntake_maleMapper.selectByPrimaryKey(age + 1));
                 return intake;

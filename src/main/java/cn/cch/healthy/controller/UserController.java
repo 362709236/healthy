@@ -274,7 +274,18 @@ public class UserController {
     }
 
     @RequestMapping("ceshi")
-    public String ceshi(){
+    public String ceshi(@RequestParam("openid") String openid){
+        if(openid==null||openid.equals("")){
+            System.out.println("ssss");
+        }else{
+            double dou_openid = Double.valueOf(openid);
+            System.out.println(dou_openid);
+        }
+//        if (){
+//            System.out.println("ssss");
+//        }
+
+        System.out.println(openid);
         return "成功";
     }
 

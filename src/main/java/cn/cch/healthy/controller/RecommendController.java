@@ -59,6 +59,12 @@ public class RecommendController {
             time = 2;
         else
             time = 3;
+
+        //若用户没有填写性别和年龄   就无法推送
+        if (consumer.getUserSex() == null || consumer.getUserAge() == null){
+            return null;
+        }
+
         StandardIntake intake = standardIntakeService.getStandardIntake(consumer);
         List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(time);
 
@@ -198,8 +204,20 @@ public class RecommendController {
     * */
     @ResponseBody
     @RequestMapping("/test2")
-    public List<DietRecord> test2()
-    {
-        return dietRecordService.selectRecentRecord(1,3,2);
+    public List<Map> test2() throws Exception {
+        List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(2);
+        List<Adward> adwards = new ArrayList<Adward>();
+        List list=new ArrayList();
+        //设置奖品的名称(套餐id)和权重
+        for(int i=0;i<setMealList.size();i++)
+        {
+            Adward adward = new Adward(setMealList.get(i).getSmId());
+            adwards.add(adward);
+            adward.setRecipeList(setMealService.selectRecipeId(setMealList.get(i).getSmId()));
+        }
+        AdwardUtil adwardUtil = new AdwardUtil();
+        List<Map> records = dietRecordService.selectRecentRecord(1, 1, 2);
+        adwards=adwardUtil.balanceWeight(records,adwards);
+        return records;
     }
 }
