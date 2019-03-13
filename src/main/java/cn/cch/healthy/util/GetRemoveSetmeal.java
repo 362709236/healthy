@@ -3,10 +3,14 @@ package cn.cch.healthy.util;
 import cn.cch.healthy.model.*;
 import cn.cch.healthy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class GetRemoveSetmeal {
 
     @Autowired
@@ -24,6 +28,12 @@ public class GetRemoveSetmeal {
     @Autowired
     SetMealService setMealService;
 
+    public GetRemoveSetmeal(){
+
+    }
+
+    public static GetRemoveSetmeal getRemoveSetmeal;
+
     /*
     * 传进参数：User_id
     * 返回参数：ArrayList SetmealIdlist
@@ -31,13 +41,14 @@ public class GetRemoveSetmeal {
     * 功能：获取用户不能食用的套餐集合
     * */
 
-    public ArrayList GetRemoveSetmeal(int user_id){
-        List<UserIllness> UINlist = userIllnessService.SelectByUserid(user_id);
-        if (UINlist.size() != 0){
+    public List GetRemoveSetmeal(List<UserIllness> UINlist){
+
+        System.out.println(UINlist);
+        if (UINlist.size() != 0||UINlist!=null){
             ArrayList<Integer> RecipesIdlist = new ArrayList<>();
             for (int i = 0;i<UINlist.size();i++){
                 int ill_id = UINlist.get(i).getIllId();
-                List<RecipesIllness> RIlist = recipesIllnessService.SelectByillId(ill_id);
+                List<RecipesIllness> RIlist = getRemoveSetmeal.recipesIllnessService.SelectByillId(ill_id);
                 if (RIlist.size() != 0){
                     for (int n = 0;n<RIlist.size();n++){
                         int Recipes_id = RIlist.get(n).getRecipesId();
@@ -45,11 +56,11 @@ public class GetRemoveSetmeal {
                     }
                 }
 
-                List<FoodIllness> FIlist = foodillnessService.SelectByillId(ill_id);
+                List<FoodIllness> FIlist = getRemoveSetmeal.foodillnessService.SelectByillId(ill_id);
                 if (FIlist.size() != 0){
                     for (int m = 0;m< FIlist.size();m++){
                         int food_id = FIlist.get(m).getFoodId();
-                        List<FoodFormula> FFlist = foodFormulaService.SelectByFoodid(food_id);
+                        List<FoodFormula> FFlist = getRemoveSetmeal.foodFormulaService.SelectByFoodid(food_id);
                         if (FFlist.size() != 0){
                             for (int p = 0;p<FFlist.size();p++){
                                 int Recipes_id = FFlist.get(p).getRecipesId();
@@ -61,20 +72,32 @@ public class GetRemoveSetmeal {
             }
 
             if (RecipesIdlist.size() != 0){
-                ArrayList<Integer> SetmealIdlist = new ArrayList<>();
+                List<Integer> SetmealIdlist = new ArrayList<>();
                 for (int i = 0;i<RecipesIdlist.size();i++){
-                    SetMeal SM = setMealService.SelectByRecipesid(RecipesIdlist.get(i));
-                    SetmealIdlist.add(SM.getSmId());
+                    SetMeal SM = getRemoveSetmeal.setMealService.SelectByRecipesid(RecipesIdlist.get(i));
+                    if (SM!=null)
+                        SetmealIdlist.add(SM.getSmId());
                 }
                 return SetmealIdlist;
             }else{
-                return null;
+                List<Integer> list = new ArrayList<Integer>();
+                return list;
             }
         }else{
-            return null;
+            List<Integer> list = new ArrayList<Integer>();
+            return list;
         }
 
 
     }
 
+    @PostConstruct
+    public void init() {
+        getRemoveSetmeal = this;
+        getRemoveSetmeal.userIllnessService = this.userIllnessService;
+        getRemoveSetmeal.foodillnessService = this.foodillnessService;
+        getRemoveSetmeal.recipesIllnessService = this.recipesIllnessService;
+        getRemoveSetmeal.foodFormulaService = this.foodFormulaService;
+        getRemoveSetmeal.setMealService = this.setMealService;
+    }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -41,13 +42,15 @@ public class DietRecordService {
             System.out.println("第"+i+"次循环");
             Date date1 = records.get(i).getDrDate();
             Date date2 = new Date();
-            long dayNum =  getInterval(date1,date2);
+            long dayNum =  daysOfTwo_2(date1,date2);
+            dayNum++;
+            System.out.println("和今天相差"+dayNum+"天");
             for (int j=0;j<list.size();j++)
             {
                 Map map = new HashMap();
                 map.put("recipeId",list.get(j));
                 if(list.get(j)==44)
-                    dayNum=0;
+                    dayNum=-1;
                 if(dayNum==1)
                     map.put("deWeight",oneDeWeight);
                 else if (dayNum==2)
@@ -62,18 +65,12 @@ public class DietRecordService {
         return recordMap;
     }
 
-    public long getInterval(Date begin_date, Date end_date) throws Exception{
-        long day = 0;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        if(begin_date != null){
-            String begin = sdf.format(begin_date);
-            begin_date  = sdf.parse(begin);
-        }
-        if(end_date!= null){
-            String end= sdf.format(end_date);
-            end_date= sdf.parse(end);
-        }
-        day = (end_date.getTime()-begin_date.getTime())/(24*60*60*1000);
-        return day;
+
+    public long daysOfTwo_2(Date fDate,Date oDate) throws ParseException {
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+        //跨年不会出现问题
+        //如果时间为：2016-03-18 11:59:59 和 2016-03-19 00:00:01的话差值为 0
+        long days=(oDate.getTime()-fDate.getTime())/(1000*3600*24);
+        return days;
     }
 }
