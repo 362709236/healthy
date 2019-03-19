@@ -10,10 +10,6 @@ import java.util.Map;
 
 public class AdwardUtil {
 
-    @Autowired
-    SetMealService setMealService;
-    @Autowired
-    DietRecordService dietRecordService;
 
     public List<Adward> balanceWeight(List<Map> records,List<Adward> adwards) throws Exception
     {

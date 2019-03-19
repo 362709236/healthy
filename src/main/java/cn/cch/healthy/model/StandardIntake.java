@@ -127,4 +127,20 @@ public class StandardIntake {
     public void setSiSpecial(Integer siSpecial) {
         this.siSpecial = siSpecial;
     }
+
+    @Override
+    public String toString() {
+        return "StandardIntake{" +
+                "siId=" + siId +
+                ", siAge=" + siAge +
+                ", siEnergy=" + siEnergy +
+                ", siPortein=" + siPortein +
+                ", siVitaminA=" + siVitaminA +
+                ", siVitaminB1=" + siVitaminB1 +
+                ", siVitaminB2=" + siVitaminB2 +
+                ", siVitaminC=" + siVitaminC +
+                ", siPhysical=" + siPhysical +
+                ", siSpecial=" + siSpecial +
+                '}';
+    }
 }

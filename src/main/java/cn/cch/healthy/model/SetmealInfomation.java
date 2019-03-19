@@ -160,4 +160,26 @@ public class SetmealInfomation {
     public void setRightTime(Integer rightTime) {
         this.rightTime = rightTime;
     }
+
+    @Override
+    public String toString() {
+        return "SetmealInfomation{" +
+                "smId=" + smId +
+                ", smName='" + smName + '\'' +
+                ", siFat=" + siFat +
+                ", siEnergy=" + siEnergy +
+                ", siPortein=" + siPortein +
+                ", siVitaminA=" + siVitaminA +
+                ", siVitaminB1=" + siVitaminB1 +
+                ", siVitaminB2=" + siVitaminB2 +
+                ", siVitaminC=" + siVitaminC +
+                ", siVitaminE=" + siVitaminE +
+                ", siMg=" + siMg +
+                ", siCa=" + siCa +
+                ", siZn=" + siZn +
+                ", siFe=" + siFe +
+                ", siCholesterol=" + siCholesterol +
+                ", rightTime=" + rightTime +
+                '}';
+    }
 }

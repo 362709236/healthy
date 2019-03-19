@@ -6,6 +6,7 @@ import cn.cch.healthy.model.UserIllness;
 import cn.cch.healthy.model.Userinfo;
 import cn.cch.healthy.service.*;
 import cn.cch.healthy.util.FaceUtil;
+import cn.cch.healthy.util.RecommendUtil;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,10 +81,13 @@ public class UserController {
 
     //比对用户
     @RequestMapping("/compare")
-    public void CompareFace() throws JSONException {
+    public Map CompareFace() throws Exception {
+        Map map = new HashMap();
         List<String> faceList=testservice.test2();
         List<Userinfo> userList=userinfoService.SelectAll();  //获取所有用户
 //        String token="5fa320fbf715f1b0857b555e62d52006";   //测试用
+        if (faceList.size()==0||userList.size()==0)
+            return map;
         for(int i=0;i<faceList.size();i++){
             for(int j=0;j<userList.size();j++){                 //将拍摄图片所得facetoken与用户的facetoken进行比对
                 if (userList.get(j).getUserFaceToken()==null){
@@ -93,20 +97,13 @@ public class UserController {
                 if(isExit){
                     //推送内容
                     System.out.println("chenggong");    //测试用
-
-//                    RecommendController rc = new RecommendController();
-//                    List<Map> list = rc.recommend(userList.get(j));
-//                    if (list.size() !=0 ){
-//                        for (int l = 0;l<list.size();l++){
-//                            String Recipes_name = (String) list.get(l).get("name");
-//                        }
-//                    }
+                    RecommendUtil recommendUtil = new RecommendUtil();
+                    map=recommendUtil.recommend(1);
+                    return map;
                 }
             }
-//            boolean isExit= FaceUtil.compare(token,faceList.get(i));  //测试用
-
-//            System.out.println(" zhe"+i+isExit);     //测试用
         }
+        return map;
     }
 
     @RequestMapping("GetUserData")

@@ -34,7 +34,8 @@ public class RecommendController {
     DietRecordService dietRecordService;
     @Autowired
     UserIllnessService userIllnessService;
-
+    @Autowired
+    RecommendUtil recommendUtil;
 
 
 
@@ -43,9 +44,9 @@ public class RecommendController {
     * */
     @ResponseBody
     @RequestMapping("/test")
-    public List<Map> test() throws Exception {
+    public Map test() throws Exception {
         //List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(2);
-        RecommendUtil recommendUtil = new RecommendUtil();
+
         return recommendUtil.recommend(1);
     }
     /*
