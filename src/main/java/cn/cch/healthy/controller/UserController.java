@@ -236,7 +236,7 @@ public class UserController {
         }
         if (deleteList.size() != 0){
             for (int i = 0;i<deleteList.size();i++){
-                int ill_id = insertList.get(i);
+                int ill_id = deleteList.get(i);
                 UserIllness UI = new UserIllness();
                 UI.setIllId(ill_id);
                 UI.setUserId(user_id);

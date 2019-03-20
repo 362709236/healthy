@@ -19,7 +19,7 @@ public class SetMealService {
 
     public int DeleteByRecipesId(SetMeal SM){ return mapper.deleteByRecipesId(SM); }
 
-    public SetMeal SelectByRecipesid(int recipesId){ return mapper.selectByRecipesid(recipesId); }
+    public List SelectByRecipesid(int recipesId){ return mapper.selectByRecipesid(recipesId); }
 
     public List<Integer> selectRecipeId(int smId){return mapper.selectRecipeId(smId);}
 }

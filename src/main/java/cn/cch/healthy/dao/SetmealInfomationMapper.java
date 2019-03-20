@@ -20,4 +20,6 @@ public interface SetmealInfomationMapper {
     int updateByPrimaryKey(SetmealInfomation record);
 
     List selectByTime(int time);
+
+    String findSMnameByPrimaryKey(int smId);
 }

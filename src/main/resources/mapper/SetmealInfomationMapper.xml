@@ -29,6 +29,11 @@
     from setmealinfomation
     where SM_id = #{smId,jdbcType=INTEGER}
   </select>
+
+  <select id="findSMnameByPrimaryKey" resultType="String" parameterType="java.lang.Integer">
+    select SM_name from setmealinfomation where SM_id = #{smId,jdbcType=INTEGER}
+  </select>
+
   <select id="selectByTime" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />

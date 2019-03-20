@@ -19,4 +19,6 @@ public class SetmealInfomationService {
 
     public int UpdateByPrimaryKeySelective(SetmealInfomation SmI){ return mapper.updateByPrimaryKeySelective(SmI); }
 
+    public String FindSMnameByPrimaryKey(int smId){ return mapper.findSMnameByPrimaryKey(smId); }
+
 }

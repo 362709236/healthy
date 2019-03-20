@@ -72,12 +72,32 @@ public class GetRemoveSetmeal {
             }
 
             if (RecipesIdlist.size() != 0){
-                List<Integer> SetmealIdlist = new ArrayList<>();
-                for (int i = 0;i<RecipesIdlist.size();i++){
-                    SetMeal SM = getRemoveSetmeal.setMealService.SelectByRecipesid(RecipesIdlist.get(i));
-                    if (SM!=null)
-                        SetmealIdlist.add(SM.getSmId());
+                for (int i = 0; i < RecipesIdlist.size() - 1; i++) {
+                    for (int j = i + 1; j < RecipesIdlist.size(); j++) {
+                        if (RecipesIdlist.get(i) == RecipesIdlist.get(j)) {
+                            RecipesIdlist.remove(Integer.valueOf(RecipesIdlist.get(j)));
+                        }
+                    }
                 }
+
+                ArrayList<Integer> SetmealIdlist = new ArrayList<Integer>();
+                for (int i = 0;i<RecipesIdlist.size();i++){
+                    List<SetMeal> SMlist = getRemoveSetmeal.setMealService.SelectByRecipesid(RecipesIdlist.get(i));
+                    if (SMlist.size() != 0){
+                        for (int j = 0;j<SMlist.size();j++){
+                            SetmealIdlist.add(SMlist.get(j).getSmId());
+                        }
+                    }
+                }
+
+                for (int i = 0; i < SetmealIdlist.size() - 1; i++) {
+                    for (int j = i + 1; j < SetmealIdlist.size(); j++) {
+                        if (SetmealIdlist.get(i) == SetmealIdlist.get(j)) {
+                            SetmealIdlist.remove(Integer.valueOf(SetmealIdlist.get(j)));
+                        }
+                    }
+                }
+
                 return SetmealIdlist;
             }else{
                 List<Integer> list = new ArrayList<Integer>();
