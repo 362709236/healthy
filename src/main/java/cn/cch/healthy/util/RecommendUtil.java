@@ -75,7 +75,7 @@ public class RecommendUtil {
         }
 
         StandardIntake intake = recommendUtil.standardIntakeService.getStandardIntake(consumer);
-        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(3);
+        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(2);
         System.out.println(intake);
         for (int i=0;i<setMealList.size();i++)
         {
@@ -86,7 +86,7 @@ public class RecommendUtil {
         //通过能量需要筛选
         for(int i =setMealList.size()-1;i>=0;i--)
         {
-            System.out.println("能量:第"+(6-i)+"次筛选");
+            System.out.println("能量:第"+(setMealList.size()-i)+"次筛选");
             if(setMealList.get(i).getSiEnergy()>(intake.getSiEnergy()*rate+energyRange)
                     ||setMealList.get(i).getSiEnergy()<(intake.getSiEnergy()*rate-energyRange))
             {
@@ -129,7 +129,7 @@ public class RecommendUtil {
         System.out.println("过滤掉近3天推荐过的套餐得到的列表长度"+setMealList.size());*/
         //过滤掉当前用户禁止食用的套餐
         List<UserIllness> UINlist = recommendUtil.userIllnessService.SelectByUserid(userId);
-        List forbiddenList = getRemoveSetmeal.GetRemoveSetmeal(UINlist);
+        /*List forbiddenList = getRemoveSetmeal.GetRemoveSetmeal(UINlist);
         for(int i =setMealList.size()-1;i>=0;i--)
         {
 
@@ -138,7 +138,7 @@ public class RecommendUtil {
                 if(setMealList.get(i).getSmId()==forbiddenList.get(i))
                     setMealList.remove(i);
             }
-        }
+        }*/
         System.out.println("随机算法之前列表的长度是"+setMealList.size());
         if(setMealList.size()==0)
             return new HashMap();
