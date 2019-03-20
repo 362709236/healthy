@@ -129,7 +129,8 @@ public class RecommendUtil {
         System.out.println("过滤掉近3天推荐过的套餐得到的列表长度"+setMealList.size());*/
         //过滤掉当前用户禁止食用的套餐
         List<UserIllness> UINlist = recommendUtil.userIllnessService.SelectByUserid(userId);
-        /*List forbiddenList = getRemoveSetmeal.GetRemoveSetmeal(UINlist);
+        System.out.println(UINlist.get(0).getIllId());
+        List forbiddenList = getRemoveSetmeal.GetRemoveSetmeal(UINlist);
         for(int i =setMealList.size()-1;i>=0;i--)
         {
 
@@ -138,7 +139,7 @@ public class RecommendUtil {
                 if(setMealList.get(i).getSmId()==forbiddenList.get(i))
                     setMealList.remove(i);
             }
-        }*/
+        }
         System.out.println("随机算法之前列表的长度是"+setMealList.size());
         if(setMealList.size()==0)
             return new HashMap();
@@ -169,12 +170,15 @@ public class RecommendUtil {
         List<SetMeal> setMealContent = recommendUtil.setMealService.SelectBySMid(adwards.get(index).getSmId());
         Map map = new HashMap();
         List name = new ArrayList();
+        String SM_name = setmealInfomationService.FindSMnameByPrimaryKey(setMealContent.get(0).getSmId());
+
         for(int i=0;i<setMealContent.size();i++)
         {
 
             name.add(recommendUtil.recipesService.getName(setMealContent.get(i).getRecipesId()));
         }
         map.put("smId",setMealContent.get(0).getSmId());
+        map.put("smname",SM_name);
         map.put("nameList",name);
         //添加推送记录
         PushInfomation pushInfomation = new PushInfomation();

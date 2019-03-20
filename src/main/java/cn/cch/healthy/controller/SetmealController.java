@@ -31,12 +31,6 @@ public class SetmealController {
     @Autowired
     SetMealService setMealService;
 
-    @Test
-    public void shiyan(){
-
-
-    }
-
     //新增套餐
     @RequestMapping("insert")
     public String insertSM(@RequestParam("name") String name){
@@ -65,7 +59,6 @@ public class SetmealController {
         System.out.println(Righttime);
         return 0;
     }
-
 
     //搭配套餐
     @RequestMapping("update")
