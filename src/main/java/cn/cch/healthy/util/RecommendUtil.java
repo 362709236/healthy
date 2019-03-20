@@ -170,12 +170,15 @@ public class RecommendUtil {
         List<SetMeal> setMealContent = recommendUtil.setMealService.SelectBySMid(adwards.get(index).getSmId());
         Map map = new HashMap();
         List name = new ArrayList();
+        String SM_name = setmealInfomationService.FindSMnameByPrimaryKey(setMealContent.get(0).getSmId());
+
         for(int i=0;i<setMealContent.size();i++)
         {
 
             name.add(recommendUtil.recipesService.getName(setMealContent.get(i).getRecipesId()));
         }
         map.put("smId",setMealContent.get(0).getSmId());
+        map.put("smname",SM_name);
         map.put("nameList",name);
         //添加推送记录
         PushInfomation pushInfomation = new PushInfomation();
