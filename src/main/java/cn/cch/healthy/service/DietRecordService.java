@@ -73,4 +73,8 @@ public class DietRecordService {
         long days=(oDate.getTime()-fDate.getTime())/(1000*3600*24);
         return days;
     }
+
+    public List SelectByDate(String dateStr,int userId){ return mapper.selectByDate(dateStr,userId); }
+
+    public List SelectByDRid(int DR_id){ return subMapper.selectByDRid(DR_id); }
 }

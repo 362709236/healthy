@@ -169,7 +169,7 @@ public class RecommendUtil {
         System.out.println("推荐的套餐id是"+adwards.get(index).getSmId());
         List<SetMeal> setMealContent = recommendUtil.setMealService.SelectBySMid(adwards.get(index).getSmId());
         Map map = new HashMap();
-        List name = new ArrayList();
+        List name = new ArrayList();    
         String SM_name = setmealInfomationService.FindSMnameByPrimaryKey(setMealContent.get(0).getSmId());
 
         for(int i=0;i<setMealContent.size();i++)

@@ -16,6 +16,12 @@
     from dietrecord
     where DR_id = #{drId,jdbcType=INTEGER}
   </select>
+
+  <select id="selectByDate" resultMap="BaseResultMap">
+    select * from dietrecord where DR_date LIKE CONCAT(CONCAT('%', #{dateStr}),'%')
+    and User_id = #{userId,jdbcType=INTEGER}
+  </select>
+
   <select id="selectRecentDiet" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />
