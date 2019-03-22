@@ -1,6 +1,7 @@
 package cn.cch.healthy.dao;
 
 import cn.cch.healthy.model.DietRecord;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface DietRecordMapper {
     int updateByPrimaryKeySelective(DietRecord record);
 
     int updateByPrimaryKey(DietRecord record);
+
+    List selectByDate(@Param("dateStr") String dateStr,@Param("userId") int userId);
 }
