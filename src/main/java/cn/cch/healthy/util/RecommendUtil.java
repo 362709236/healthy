@@ -117,7 +117,7 @@ public class RecommendUtil {
         }
         System.out.println("通过脂肪需要筛选得到的列表长度"+setMealList.size());
         /*//过滤掉近3天推荐过的套餐
-        List<PushInfomation> newestPush = recommendUtil.pushInfomationService.selectRecentPush(3);
+        List<PushInfomation> newestPush = recommendUtil.pushInfoma  我tionService.selectRecentPush(3);
         for(int i =setMealList.size()-1;i>=0;i--)
         {
             for(int j=0;j<newestPush.size();j++)
@@ -177,7 +177,7 @@ public class RecommendUtil {
 
             name.add(recommendUtil.recipesService.getName(setMealContent.get(i).getRecipesId()));
         }
-        map.put("smId",setMealContent.get(0).getSmId());
+        map.put("openid",consumer.getUserOpenid());
         map.put("smname",SM_name);
         map.put("nameList",name);
         //添加推送记录

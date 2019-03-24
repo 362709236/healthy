@@ -178,6 +178,7 @@ public class FaceUtil {
             String returnString = postHttp(formparams, "https://api-cn.faceplusplus.com/facepp/v3/compare");
             try {
                 JSONObject json = new JSONObject(returnString);
+                System.out.println("json:"+json);
                 String confidence = json.getString("confidence");
                 System.out.println("置信度为" + confidence);
                 JSONObject thresholdsJson = json.getJSONObject("thresholds");

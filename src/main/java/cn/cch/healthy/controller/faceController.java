@@ -25,7 +25,7 @@ public class faceController {
         return "index.html";
     }
 //比对用户
-    @GetMapping("/face/compare")
+    /*@GetMapping("/face/compare")
     public void getFace2(Model  model) throws JSONException {
         List<String> faceList=testservice.test2();
 //        List<User> userList=userService.getAllUser();  //获取所有用户
@@ -41,7 +41,7 @@ public class faceController {
             }
             System.out.println(" zhe"+i+isExit);     //测试用
         }
-    }
+    }*/
     //用户上传图片并存储facetoken;
     @RequestMapping(value="/picture")
     public String picture(MultipartFile file) throws IOException {

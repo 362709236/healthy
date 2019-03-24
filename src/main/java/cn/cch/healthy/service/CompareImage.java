@@ -12,9 +12,9 @@ import java.util.*;
 @Service
 public class CompareImage {
 
-    public List<String> test2 () throws JSONException {
+    public List<String> test2 (String path) throws JSONException {
 
-        File file = new File("C:\\Users\\Administrator\\Desktop\\人脸集合\\4.jpg");    //假装是拍摄的图片
+        File file = new File(path);    //假装是拍摄的图片
         byte[] buff = FaceUtil.getBytesFromFile(file);
         String str = FaceUtil.check(buff);
         //facetoken 集合
@@ -27,7 +27,7 @@ public class CompareImage {
                 JSONObject faceObject = faceArray.getJSONObject(i);
                 String face_token = faceObject.getString("face_token");
                 faceList.add(face_token);
-                System.out.println("token"+" "+i+face_token);
+                System.out.println("token"+" "+i+" "+face_token);
             }
         }catch (Exception e) {
             e.printStackTrace();
