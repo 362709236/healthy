@@ -75,7 +75,7 @@ public class RecommendUtil {
         }
 
         StandardIntake intake = recommendUtil.standardIntakeService.getStandardIntake(consumer);
-        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(2);
+        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(time);
         System.out.println(intake);
         for (int i=0;i<setMealList.size();i++)
         {
