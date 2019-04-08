@@ -1,5 +1,6 @@
 package cn.cch.healthy.util;
 
+import Jama.Matrix;
 import cn.cch.healthy.model.*;
 import cn.cch.healthy.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +62,7 @@ public class RecommendUtil {
         else if(date.getHours()>=10&&date.getHours()<16)
         {
             time = 2;
-            rate = 0.4;
+            rate = 0.35;
         }
         else
             {
@@ -75,7 +76,7 @@ public class RecommendUtil {
         }
 
         StandardIntake intake = recommendUtil.standardIntakeService.getStandardIntake(consumer);
-        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(2);
+        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(time);
         System.out.println(intake);
         for (int i=0;i<setMealList.size();i++)
         {
@@ -86,10 +87,11 @@ public class RecommendUtil {
         //通过能量需要筛选
         for(int i =setMealList.size()-1;i>=0;i--)
         {
-            System.out.println("能量:第"+(setMealList.size()-i)+"次筛选");
             if(setMealList.get(i).getSiEnergy()>(intake.getSiEnergy()*rate+energyRange)
                     ||setMealList.get(i).getSiEnergy()<(intake.getSiEnergy()*rate-energyRange))
             {
+                System.out.println("目标能量值是:"+setMealList.get(i).getSiEnergy());
+                System.out.println("需要的能量值是:"+(intake.getSiEnergy()*rate-energyRange)+"到"+(intake.getSiEnergy()*rate+energyRange));
                 System.out.println("第"+(i)+"个套餐不满足能量需求而被移除");
                 setMealList.remove(i);
             }
@@ -129,8 +131,7 @@ public class RecommendUtil {
         System.out.println("过滤掉近3天推荐过的套餐得到的列表长度"+setMealList.size());*/
         //过滤掉当前用户禁止食用的套餐
         List<UserIllness> UINlist = recommendUtil.userIllnessService.SelectByUserid(userId);
-        System.out.println(UINlist.get(0).getIllId());
-        List forbiddenList = getRemoveSetmeal.GetRemoveSetmeal(UINlist);
+       /* List forbiddenList = getRemoveSetmeal.GetRemoveSetmeal(UINlist);
         for(int i =setMealList.size()-1;i>=0;i--)
         {
 
@@ -139,7 +140,7 @@ public class RecommendUtil {
                 if(setMealList.get(i).getSmId()==forbiddenList.get(i))
                     setMealList.remove(i);
             }
-        }
+        }*/
         System.out.println("随机算法之前列表的长度是"+setMealList.size());
         if(setMealList.size()==0)
             return new HashMap();
@@ -200,5 +201,71 @@ public class RecommendUtil {
         recommendUtil.recipesService = this.recipesService;
         recommendUtil.dietRecordService = this.dietRecordService;
         recommendUtil.userIllnessService = this.userIllnessService;
+    }
+    /*
+    * 新的推荐算法
+    * */
+    public void recommend_score(int userId)
+    {
+        Userinfo consumer = recommendUtil.userinfoService.selectByPrimarykey(userId);
+        //若用户没有填写性别和年龄   就无法推送
+        if (consumer.getUserSex() == null || consumer.getUserAge() == null){
+            return;
+        }
+        //识别当前是早餐、午餐还是晚餐
+        int hour = Calendar.HOUR;
+        int time=1;
+        double rate=0;
+        if(hour>=0&&hour<10)
+        {
+            time = 1;
+            rate = 0.3;
+        }
+        else if(hour>=10&&hour<16)
+        {
+            time = 2;
+            rate=0.4;
+        }
+        else
+            {
+                time = 3;
+                rate = 0.3;
+            }
+        //根据中国膳食推荐摄入表获得当前用户推荐摄入量
+        StandardIntake intake = recommendUtil.standardIntakeService.getStandardIntake(consumer);
+        //获得数据库中当前时间段所有套餐
+        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(time);
+        //创建套餐分数二维数组
+        double[][] score = new double[6][setMealList.size()];
+
+        //根据蛋白质打分
+        for (int i=0;i<score[0].length;i++)
+        {
+            double distance = Math.abs(setMealList.get(i).getSiPortein()-intake.getSiPortein()*rate);
+            if(distance>30)
+            {
+                score[0][i]=1;
+                continue;
+            }
+            score[0][i]=10-distance/3;
+        }
+        //根据能量打分
+        for (int i=0;i<score[1].length;i++)
+        {
+        //    System.out.println("套餐含有的能量="+setMealList.get(i).getSiEnergy());
+         //   System.out.println("推荐的能量="+intake.getSiEnergy());
+            double distance = Math.abs(setMealList.get(i).getSiEnergy()-intake.getSiEnergy()*rate);
+            if(distance>30)
+            {
+                score[0][i]=1;
+                continue;
+            }
+            score[1][i]=10-distance;
+        }
+        double [][]weight = {{2},{3},{4},{5},{6},{7}};
+        Matrix weightMatrix = new Matrix(weight);
+        Matrix matrix = new Matrix(score);
+        matrix.times(weightMatrix);
+        matrix.print(4,2);
     }
 }

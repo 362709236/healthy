@@ -3,6 +3,8 @@ package cn.cch.healthy.dao;
 import cn.cch.healthy.model.UserInterest;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserInterestMapper {
     int deleteByPrimaryKey(Integer uiId);
@@ -12,6 +14,8 @@ public interface UserInterestMapper {
     int insertSelective(UserInterest record);
 
     UserInterest selectByPrimaryKey(Integer uiId);
+
+    List selectByUserId(int userId);
 
     int updateByPrimaryKeySelective(UserInterest record);
 
