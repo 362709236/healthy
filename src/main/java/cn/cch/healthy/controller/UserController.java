@@ -2,12 +2,10 @@ package cn.cch.healthy.controller;
 
 import cn.cch.healthy.model.*;
 import cn.cch.healthy.service.*;
-import cn.cch.healthy.util.FaceUtil;
-import cn.cch.healthy.util.RecommendUtil;
+import cn.cch.healthy.util.*;
+
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,6 +45,9 @@ public class UserController {
 
     @Autowired
     FoodService foodService;
+
+    @Autowired
+    RecommendUtil recommendUtil;
 
     @RequestMapping("uploadPic")
     public String SetUserFace(@RequestParam("openid") String openid,MultipartFile file) throws IOException {
@@ -147,28 +148,44 @@ public class UserController {
         Map map = new HashMap();
         List<String> faceList=testservice.test2(path);
         List<Userinfo> userList=userinfoService.SelectAll();  //获取所有用户
-//        String token="5fa320fbf715f1b0857b555e62d52006";   //测试用
         if (faceList.size()==0||userList.size()==0)
             return "没有检测到人脸或者无用户face_token";
         for(int i=0;i<faceList.size();i++){
-            for(int j=0;j<userList.size();j++){                 //将拍摄图片所得facetoken与用户的facetoken进行比对
+            for(int j=0;j<userList.size();j++){
+                //将拍摄图片所得facetoken与用户的facetoken进行比对
                 if (userList.get(j).getUserFaceToken()==null){
                     continue;
                 }
-
                 boolean isExit=FaceUtil.compare(userList.get(j).getUserFaceToken(),faceList.get(i));
                 if(isExit){
                     //推送内容
-                    System.out.println("chenggong");    //测试用
-                    RecommendUtil recommendUtil = new RecommendUtil();
-                    map=recommendUtil.recommend(1);
-                    System.out.println(map);
+                    map=recommendUtil.recommend(userList.get(j).getUserId());
                     JSONObject JSONmap = new JSONObject(map);
-//                    map2.put(String.valueOf(people),map);
+                    HttpTest.appadd(JSONmap);
+                    String transJson = JSONmap.toString();
+//                    String result = OkHttpUtil.postJsonParams("http://47.101.179.98/wechat/returnpost2",transJson);
+//                    String result = OkHttpUtil.postJsonParams("http://localhost:8081/demo2/demo",transJson);
+//                    String str = OkHttpUtil.doPostHttpRequest("http://localhost:8081/demo2/demo", map.toString());
+//                    String json = JSON.toJSONString(map,true);
+//                    com.alibaba.fastjson.JSONObject ob = JSON.parseObject(json);
+                    System.out.println(JSONmap);
+                    System.out.println(transJson);
+                    System.out.println("------------------");
+//                    System.out.println("retuenstr:"+str);
+//                    System.out.println("retuenstr:"+retuenstr.toString());
+                    System.out.println("------------------");
                 }
             }
         }
         return "成功";
+    }
+
+    public String returnpost1(String jsonParams){
+        return jsonParams;
+    }
+
+    public JSONObject returnpost2(JSONObject jsonParams){
+        return jsonParams;
     }
 
 //    public void interface1(JSONObject object) throws JSONException {

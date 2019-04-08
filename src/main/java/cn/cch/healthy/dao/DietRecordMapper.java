@@ -16,7 +16,7 @@ public interface DietRecordMapper {
 
     DietRecord selectByPrimaryKey(Integer drId);
 
-    List<DietRecord> selectRecentDiet(Integer userId,Integer day,Integer time);
+    List<DietRecord> selectRecentDiet(@Param("userId")Integer userId,@Param("day")Integer day,@Param("time")Integer time);
 
     int updateByPrimaryKeySelective(DietRecord record);
 
