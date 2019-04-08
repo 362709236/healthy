@@ -44,10 +44,10 @@ public class RecommendController {
     * */
     @ResponseBody
     @RequestMapping("/test")
-    public Map test() throws Exception {
+    public String test() throws Exception {
         //List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(2);
-
-        return recommendUtil.recommend(1);
+        recommendUtil.recommend_score(1);
+        return "";
     }
     /*
     * 测试接口
