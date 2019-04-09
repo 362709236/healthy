@@ -22,6 +22,10 @@
     and User_id = #{userId,jdbcType=INTEGER}
   </select>
 
+  <select id="selectAll" resultMap="BaseResultMap">
+    select * from dietrecord
+  </select>
+
   <select id="selectRecentDiet" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />

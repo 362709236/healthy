@@ -22,4 +22,6 @@ public interface SetmealInfomationMapper {
     List selectByTime(int time);
 
     String findSMnameByPrimaryKey(int smId);
+
+    List<String> selectAllForName();
 }
