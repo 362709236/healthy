@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.function.Consumer;
 
 
 @Component
@@ -29,6 +30,14 @@ public class RecommendUtil {
     DietRecordService dietRecordService;
     @Autowired
     UserIllnessService userIllnessService;
+    @Autowired
+    FoodillnessService foodillnessService;
+    @Autowired
+    InterestService interestService;
+    @Autowired
+    FoodFormulaService foodFormulaService;
+    @Autowired
+    RecipesIllnessService recipesIllnessService;
     AdwardUtil adwardUtil = new AdwardUtil();
 
     GetRemoveSetmeal getRemoveSetmeal = new GetRemoveSetmeal();
@@ -201,12 +210,15 @@ public class RecommendUtil {
         recommendUtil.recipesService = this.recipesService;
         recommendUtil.dietRecordService = this.dietRecordService;
         recommendUtil.userIllnessService = this.userIllnessService;
+        recommendUtil.interestService = this.interestService;
+        recommendUtil.foodillnessService = this.foodillnessService;
+        recommendUtil.foodFormulaService = this.foodFormulaService;
+        recommendUtil.recipesIllnessService = recipesIllnessService;
     }
     /*
     * 新的推荐算法
     * */
-    public void recommend_score(int userId)
-    {
+    public void recommend_score(int userId) throws Exception {
         Userinfo consumer = recommendUtil.userinfoService.selectByPrimarykey(userId);
         //若用户没有填写性别和年龄   就无法推送
         if (consumer.getUserSex() == null || consumer.getUserAge() == null){
@@ -235,37 +247,131 @@ public class RecommendUtil {
         StandardIntake intake = recommendUtil.standardIntakeService.getStandardIntake(consumer);
         //获得数据库中当前时间段所有套餐
         List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(time);
-        //创建套餐分数二维数组
-        double[][] score = new double[6][setMealList.size()];
+        List<Map> eatingRecord = dietRecordService.selectRecentRecord(userId,3,time);
+        double [] score = new double[setMealList.size()];
+        for(int i=0;i<setMealList.size();i++)
+        {
+            score[i]=mark(userId,setMealList.get(i),intake,rate,time,eatingRecord);
+        }
+        //从大到小排序
+        double temp;
+        SetmealInfomation tempSM;
+        for (int i=0;i<3;i++)
+        {
+            for(int j=i+1;j<score.length;j++)
+            {
+                if(score[i]<score[j])
+                {
+                    temp = score[i];
+                    score[i] = score[j];
+                    score[j]=temp;
+                    tempSM = setMealList.get(i);
+                    setMealList.set(i,setMealList.get(j));
+                    setMealList.set(j,tempSM);
+                }
+            }
+        }
+        for(int i=0;i<setMealList.size();i++)
+        {
+            System.out.println("套餐"+i+"的最终得分为"+score[i]);
+        }
+    }
+    @Value("${PROTEINWEIGHT}")
+    private double PROTEINWEIGHT;
+    @Value("${ENERGYWEIGHT}")
+    private double ENERGYWEIGHT;
+    @Value("${RECENTWEIGHT}")
+    private double RECENTWEIGHT;
+    @Value("${INTERESTWEIGHT}")
+    private double INTERESTWEIGHT;
+    @Value("${ILLNESSWEIGHT}")
+    private double ILLNESSWEIGHT;
+    /*
+    * 描述：为一个套餐打分
+    * */
+    public double mark(int userId,SetmealInfomation setmeal,StandardIntake intake,double rate,int time,
+                       List<Map> eatingRecord) throws Exception {
+        double distance;
+        //套餐中的菜品列表
+        List recipeList = setMealService.selectRecipeId(setmeal.getSmId());
 
-        //根据蛋白质打分
-        for (int i=0;i<score[0].length;i++)
+
+        //蛋白质打分
+        distance = Math.abs(setmeal.getSiPortein()-intake.getSiPortein()*rate);
+        double score_protein = 10-distance/3;
+        if (score_protein<0)
+            score_protein=0;
+
+        //能量打分
+        distance = Math.abs(setmeal.getSiEnergy()-intake.getSiEnergy()*rate);
+        double score_energy = 10-distance/30;
+        if(score_energy<0)
+            score_energy=0;
+
+        //近期是否吃过相同菜品打分
+        double deScore=0;
+        for(int i=0;i<recipeList.size();i++)
         {
-            double distance = Math.abs(setMealList.get(i).getSiPortein()-intake.getSiPortein()*rate);
-            if(distance>30)
+            for (int j=0;j<eatingRecord.size();j++)
             {
-                score[0][i]=1;
-                continue;
+                if (recipeList.get(i)==eatingRecord.get(j).get("recipeId"))
+                    deScore+=Double.parseDouble(eatingRecord.get(j).get("deWeight").toString());
             }
-            score[0][i]=10-distance/3;
         }
-        //根据能量打分
-        for (int i=0;i<score[1].length;i++)
+        double score_recent = 10-deScore;
+        if(score_recent<0)
+            score_recent=0;
+
+        //食堂剩余量打分
+        //是否符合用户爱好打分
+        double matchDegree = interestService.match(setmeal.getSmId(),userId)*2;
+        double score_match = matchDegree;
+        if (score_match>10)
+            score_match=10;
+
+        //根据用户当前疾病打分
+        List<Integer> illness = userIllnessService.SelectByUserid(userId);
+            //用户当前禁止吃的食材列表
+        List<Integer> forbbiden_food = new ArrayList<Integer>();
+        for (int i=0;i<illness.size();i++)
         {
-        //    System.out.println("套餐含有的能量="+setMealList.get(i).getSiEnergy());
-         //   System.out.println("推荐的能量="+intake.getSiEnergy());
-            double distance = Math.abs(setMealList.get(i).getSiEnergy()-intake.getSiEnergy()*rate);
-            if(distance>30)
-            {
-                score[0][i]=1;
-                continue;
-            }
-            score[1][i]=10-distance;
+            List list = foodillnessService.SelectByillId(illness.get(i));
+            forbbiden_food.addAll(list);
         }
-        double [][]weight = {{2},{3},{4},{5},{6},{7}};
-        Matrix weightMatrix = new Matrix(weight);
-        Matrix matrix = new Matrix(score);
-        matrix.times(weightMatrix);
-        matrix.print(4,2);
+            //禁止吃的食材做成的食物列表
+        List<Integer> forbbiden_recipe = new ArrayList<Integer>();
+        for (int i=0;i<forbbiden_food.size();i++)
+        {
+            List list = foodFormulaService.selectRecipeIdByFoodid(forbbiden_food.get(i));
+            forbbiden_recipe.addAll(list);
+        }
+        for (int i=0;i<illness.size();i++)
+            forbbiden_recipe.addAll(recipesIllnessService.selectRecipeIdByillId(illness.get(i)));
+            //删除重复元素
+        for ( int  i  =   0 ; i  <  forbbiden_recipe.size()  -   1 ; i ++ )  {
+            for  ( int  j  =  forbbiden_recipe.size()  -   1 ; j  >  i; j -- )  {
+                if  (forbbiden_recipe.get(j)==forbbiden_recipe.get(i))  {
+                    forbbiden_recipe.remove(j);
+                }
+            }
+        }
+     //   for(int i=0;i<forbbiden_recipe.size();i++)
+     //       System.out.println("禁止吃菜品"+forbbiden_recipe.get(i));
+        double score_illness =0;
+        for(int i=0;i<recipeList.size();i++)
+        {
+            for(int j=0;j<forbbiden_recipe.size();j++)
+            {
+                if(recipeList.get(i)==forbbiden_recipe.get(j))
+                    score_illness+=5;
+            }
+        }
+        if (score_illness>10)
+            score_illness=10;
+        //计算最终得分
+        double finalScore=score_protein*PROTEINWEIGHT+score_energy*ENERGYWEIGHT
+                +score_recent*RECENTWEIGHT+score_match*INTERESTWEIGHT+
+                score_illness*ILLNESSWEIGHT;
+        return finalScore;
     }
 }

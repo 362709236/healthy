@@ -39,12 +39,12 @@ public class DietRecordService {
         for(int i=0;i<records.size();i++)
         {
             List<Integer> list = subMapper.selectByDRid(records.get(i).getDrId());
-            System.out.println("第"+i+"次循环");
+         //   System.out.println("第"+i+"次循环");
             Date date1 = records.get(i).getDrDate();
             Date date2 = new Date();
             long dayNum =  daysOfTwo_2(date1,date2);
             dayNum++;
-            System.out.println("和今天相差"+dayNum+"天");
+           // System.out.println("和今天相差"+dayNum+"天");
             for (int j=0;j<list.size();j++)
             {
                 Map map = new HashMap();

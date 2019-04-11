@@ -20,4 +20,6 @@ public interface RecipesIllnessMapper {
     int updateByPrimaryKey(RecipesIllness record);
 
     List selectByillId(int illId);
+
+    List<Integer> selectRecipeIdByillId(int illId);
 }

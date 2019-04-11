@@ -16,8 +16,8 @@
     where UIN_id = #{uinId,jdbcType=INTEGER}
   </select>
 
-  <select id="selectByUserid" resultMap="BaseResultMap">
-    select * from userillness where user_id = #{userId,jdbcType=INTEGER}
+  <select id="selectByUserid" resultType="java.lang.Integer">
+    select ill_id from userillness where user_id = #{userId,jdbcType=INTEGER}
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >

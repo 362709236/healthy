@@ -16,8 +16,8 @@
     where FI_id = #{fiId,jdbcType=INTEGER}
   </select>
 
-  <select id="selectByillId" resultMap="BaseResultMap">
-    select * from foodillness where ill_id = #{illId,jdbcType=INTEGER}
+  <select id="selectByillId" resultType="java.lang.Integer">
+    select Food_id from foodillness where ill_id = #{illId,jdbcType=INTEGER}
   </select>
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >

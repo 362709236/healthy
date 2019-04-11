@@ -3,6 +3,8 @@ package cn.cch.healthy.dao;
 import cn.cch.healthy.model.Setmeal_Interest;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface Setmeal_InterestMapper {
     int deleteByPrimaryKey(Integer id);
@@ -16,4 +18,6 @@ public interface Setmeal_InterestMapper {
     int updateByPrimaryKeySelective(Setmeal_Interest record);
 
     int updateByPrimaryKey(Setmeal_Interest record);
+
+    List selectBySmId(int smId);
 }

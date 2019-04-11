@@ -20,6 +20,10 @@
     select * from recipesillness where ill_id = #{illId,jdbcType=INTEGER}
   </select>
 
+  <select id="selectRecipeIdByillId" resultType="java.lang.Integer">
+    select Recipes_id from recipesillness where ill_id = #{illId,jdbcType=INTEGER}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from recipesillness
     where RI_id = #{riId,jdbcType=INTEGER}

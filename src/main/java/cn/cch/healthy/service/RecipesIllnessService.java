@@ -13,4 +13,6 @@ public class RecipesIllnessService {
     RecipesIllnessMapper mapper;
 
     public List SelectByillId(int ill_id){ return mapper.selectByillId(ill_id); }
+
+    public List selectRecipeIdByillId(int ill_id){return mapper.selectRecipeIdByillId(ill_id);}
 }

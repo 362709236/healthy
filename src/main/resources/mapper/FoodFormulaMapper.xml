@@ -24,6 +24,10 @@
   <select id="selectByFoodid" resultMap="BaseResultMap">
     select * from foodformula where Food_id = #{foodId,jdbcType=INTEGER}
   </select>
+
+  <select id="selectRecipeIdByFoodid" resultType="java.lang.Integer">
+    select Recipes_id from foodformula where Food_id = #{foodId,jdbcType=INTEGER}
+  </select>
   
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from foodformula
