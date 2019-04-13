@@ -12,4 +12,6 @@ public class FoodService {
     FoodMapper mapper;
 
     public Food selectByPrimaryKey(int Food_id){ return mapper.selectByPrimaryKey(Food_id); }
+
+    public int GetId(String foodname){ return mapper.getId(foodname); }
 }

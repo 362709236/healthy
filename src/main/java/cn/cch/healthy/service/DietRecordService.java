@@ -77,4 +77,10 @@ public class DietRecordService {
     public List SelectByDate(String dateStr,int userId){ return mapper.selectByDate(dateStr,userId); }
 
     public List SelectByDRid(int DR_id){ return subMapper.selectByDRid(DR_id); }
+
+    public int insert(DietRecord DR){ return mapper.insert(DR); }
+
+    public int insertsub(DietRecord_Sub DR_sub){ return subMapper.insert(DR_sub); }
+
+    public List selectAll(){ return mapper.selectAll(); }
 }

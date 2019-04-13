@@ -33,6 +33,8 @@ public class Recipes {
 
     private Double recipesCholesterol;
 
+    private Double recipesMargin;
+
     public Integer getRecipesId() {
         return recipesId;
     }
@@ -159,5 +161,13 @@ public class Recipes {
 
     public void setRecipesCholesterol(Double recipesCholesterol) {
         this.recipesCholesterol = recipesCholesterol;
+    }
+
+    public Double getRecipesMargin() {
+        return recipesMargin;
+    }
+
+    public void setRecipesMargin(Double recipesMargin) {
+        this.recipesMargin = recipesMargin;
     }
 }

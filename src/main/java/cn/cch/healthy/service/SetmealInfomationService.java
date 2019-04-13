@@ -21,4 +21,8 @@ public class SetmealInfomationService {
 
     public String FindSMnameByPrimaryKey(int smId){ return mapper.findSMnameByPrimaryKey(smId); }
 
+    public int DeleteByPrimaryKey(int smId){ return mapper.deleteByPrimaryKey(smId); }
+
+    public List<String> SelectAllForName(){ return mapper.selectAllForName(); }
+
 }

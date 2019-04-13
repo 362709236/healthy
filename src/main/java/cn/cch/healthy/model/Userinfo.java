@@ -21,7 +21,13 @@ public class Userinfo {
 
     private String userCcupation;
 
+    private String userType;
+
+    private String userNumber;
+
     private String userFaceToken;
+
+    private Date userRecognize;
 
     public Integer getUserId() {
         return userId;
@@ -95,11 +101,35 @@ public class Userinfo {
         this.userCcupation = userCcupation == null ? null : userCcupation.trim();
     }
 
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType == null ? null : userType.trim();
+    }
+
+    public String getUserNumber() {
+        return userNumber;
+    }
+
+    public void setUserNumber(String userNumber) {
+        this.userNumber = userNumber == null ? null : userNumber.trim();
+    }
+
     public String getUserFaceToken() {
         return userFaceToken;
     }
 
     public void setUserFaceToken(String userFaceToken) {
         this.userFaceToken = userFaceToken == null ? null : userFaceToken.trim();
+    }
+
+    public Date getUserRecognize() {
+        return userRecognize;
+    }
+
+    public void setUserRecognize(Date userRecognize) {
+        this.userRecognize = userRecognize;
     }
 }

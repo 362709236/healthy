@@ -18,11 +18,12 @@
     <result column="Recipes_Fe" property="recipesFe" jdbcType="DOUBLE" />
     <result column="Recipes_Zn" property="recipesZn" jdbcType="DOUBLE" />
     <result column="Recipes_cholesterol" property="recipesCholesterol" jdbcType="DOUBLE" />
+    <result column="Recipes_margin" property="recipesMargin" jdbcType="DOUBLE" />
   </resultMap>
   <sql id="Base_Column_List" >
     Recipes_id, Recipes_name, Recipes_type, Recipes_fat, Recipes_protein, Recipes_energy, 
     Recipes_vitamin_A, Recipes_vitamin_B_1, Recipes_vitamin_B_2, Recipes_vitamin_C, Recipes_vitamin_E, 
-    Recipes_Ca, Recipes_Mg, Recipes_Fe, Recipes_Zn, Recipes_cholesterol
+    Recipes_Ca, Recipes_Mg, Recipes_Fe, Recipes_Zn, Recipes_cholesterol, Recipes_margin
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -30,13 +31,19 @@
     from recipes
     where Recipes_id = #{recipesId,jdbcType=INTEGER}
   </select>
+  
   <select id="getName" resultType="java.lang.String" parameterType="java.lang.Integer">
     select Recipes_name from recipes where Recipes_id = #{recipesId,jdbcType=INTEGER}
   </select>
+
   <select id="findall" resultMap="BaseResultMap">
     select * from recipes
   </select>
 
+  <select id="getId" parameterType="String" resultType="java.lang.Integer">
+    select Recipes_id from recipes where Recipes_name = #{recipesName,jdbcType=VARCHAR}
+  </select>
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from recipes
     where Recipes_id = #{recipesId,jdbcType=INTEGER}
@@ -49,14 +56,14 @@
       Recipes_protein, Recipes_energy, Recipes_vitamin_A, 
       Recipes_vitamin_B_1, Recipes_vitamin_B_2, Recipes_vitamin_C, 
       Recipes_vitamin_E, Recipes_Ca, Recipes_Mg, 
-      Recipes_Fe, Recipes_Zn, Recipes_cholesterol
-      )
+      Recipes_Fe, Recipes_Zn, Recipes_cholesterol, 
+      Recipes_margin)
     values (#{recipesName,jdbcType=VARCHAR}, #{recipesType,jdbcType=VARCHAR}, #{recipesFat,jdbcType=DOUBLE}, 
       #{recipesProtein,jdbcType=DOUBLE}, #{recipesEnergy,jdbcType=DOUBLE}, #{recipesVitaminA,jdbcType=DOUBLE}, 
       #{recipesVitaminB1,jdbcType=DOUBLE}, #{recipesVitaminB2,jdbcType=DOUBLE}, #{recipesVitaminC,jdbcType=DOUBLE}, 
       #{recipesVitaminE,jdbcType=DOUBLE}, #{recipesCa,jdbcType=DOUBLE}, #{recipesMg,jdbcType=DOUBLE}, 
-      #{recipesFe,jdbcType=DOUBLE}, #{recipesZn,jdbcType=DOUBLE}, #{recipesCholesterol,jdbcType=DOUBLE}
-      )
+      #{recipesFe,jdbcType=DOUBLE}, #{recipesZn,jdbcType=DOUBLE}, #{recipesCholesterol,jdbcType=DOUBLE}, 
+      #{recipesMargin,jdbcType=DOUBLE})
   </insert>
   <insert id="insertSelective" parameterType="cn.cch.healthy.model.Recipes" >
     <selectKey resultType="java.lang.Integer" keyProperty="recipesId" order="AFTER" >
@@ -109,6 +116,9 @@
       <if test="recipesCholesterol != null" >
         Recipes_cholesterol,
       </if>
+      <if test="recipesMargin != null" >
+        Recipes_margin,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="recipesName != null" >
@@ -155,6 +165,9 @@
       </if>
       <if test="recipesCholesterol != null" >
         #{recipesCholesterol,jdbcType=DOUBLE},
+      </if>
+      <if test="recipesMargin != null" >
+        #{recipesMargin,jdbcType=DOUBLE},
       </if>
     </trim>
   </insert>
@@ -206,6 +219,9 @@
       <if test="recipesCholesterol != null" >
         Recipes_cholesterol = #{recipesCholesterol,jdbcType=DOUBLE},
       </if>
+      <if test="recipesMargin != null" >
+        Recipes_margin = #{recipesMargin,jdbcType=DOUBLE},
+      </if>
     </set>
     where Recipes_id = #{recipesId,jdbcType=INTEGER}
   </update>
@@ -225,7 +241,8 @@
       Recipes_Mg = #{recipesMg,jdbcType=DOUBLE},
       Recipes_Fe = #{recipesFe,jdbcType=DOUBLE},
       Recipes_Zn = #{recipesZn,jdbcType=DOUBLE},
-      Recipes_cholesterol = #{recipesCholesterol,jdbcType=DOUBLE}
+      Recipes_cholesterol = #{recipesCholesterol,jdbcType=DOUBLE},
+      Recipes_margin = #{recipesMargin,jdbcType=DOUBLE}
     where Recipes_id = #{recipesId,jdbcType=INTEGER}
   </update>
 </mapper>

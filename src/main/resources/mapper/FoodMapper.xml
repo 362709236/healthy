@@ -30,6 +30,11 @@
     from food
     where Food_id = #{foodId,jdbcType=INTEGER}
   </select>
+
+  <select id="getId" resultType="java.lang.Integer" parameterType="String">
+    select Food_id from food where Food_name = #{foodName,jdbcType=VARCHAR}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from food
     where Food_id = #{foodId,jdbcType=INTEGER}

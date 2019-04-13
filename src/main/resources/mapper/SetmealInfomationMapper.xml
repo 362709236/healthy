@@ -34,6 +34,10 @@
     select SM_name from setmealinfomation where SM_id = #{smId,jdbcType=INTEGER}
   </select>
 
+  <select id="selectAllForName" resultMap="BaseResultMap">
+    select SM_name from setmealinfomation
+  </select>
+
   <select id="selectByTime" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />

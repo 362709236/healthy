@@ -33,6 +33,11 @@
     delete from setmeal
     where SM_number = #{smNumber,jdbcType=INTEGER}
   </delete>
+  
+  <delete id="deleteBySMid" parameterType="java.lang.Integer">
+    delete from setmeal
+    where SM_id = #{smId,jdbcType=INTEGER}
+  </delete>
 
   <delete id="deleteByRecipesId" parameterType="cn.cch.healthy.model.SetMeal">
     delete from setmeal

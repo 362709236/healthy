@@ -4,7 +4,6 @@ import cn.cch.healthy.dao.RecipesMapper;
 import cn.cch.healthy.model.Recipes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
@@ -21,4 +20,10 @@ public class RecipesService {
     public Recipes SelectByPrimaryKey(int Recipes_id){ return mapper.selectByPrimaryKey(Recipes_id); }
 
     public String getName(int Recipes_id) { return mapper.getName(Recipes_id); }
+
+    public int insert(Recipes recipes){ return mapper.insert(recipes); }
+
+    public int DeleteByPrimaryKey(int id){ return mapper.deleteByPrimaryKey(id); }
+
+    public int GetId(String recipesName){ return mapper.getId(recipesName); }
 }
