@@ -24,4 +24,6 @@ public class RecipesService {
     public int insert(Recipes recipes){ return mapper.insert(recipes); }
 
     public int DeleteByPrimaryKey(int id){ return mapper.deleteByPrimaryKey(id); }
+
+    public int GetId(String recipesName){ return mapper.getId(recipesName); }
 }

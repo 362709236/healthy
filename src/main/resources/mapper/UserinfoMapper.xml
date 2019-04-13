@@ -11,11 +11,14 @@
     <result column="User_weight" property="userWeight" jdbcType="DOUBLE" />
     <result column="User_birthday" property="userBirthday" jdbcType="DATE" />
     <result column="User_ccupation" property="userCcupation" jdbcType="VARCHAR" />
+    <result column="User_type" property="userType" jdbcType="VARCHAR" />
+    <result column="User_number" property="userNumber" jdbcType="VARCHAR" />
     <result column="User_face_token" property="userFaceToken" jdbcType="VARCHAR" />
+    <result column="User_recognize" property="userRecognize" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
     User_id, User_openid, User_name, User_sex, User_age, User_height, User_weight, User_birthday, 
-    User_ccupation, User_face_token
+    User_ccupation, User_type, User_number, User_face_token, User_recognize
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -42,11 +45,13 @@
     </selectKey>
     insert into userinfo (User_openid, User_name, User_sex, 
       User_age, User_height, User_weight, 
-      User_birthday, User_ccupation, User_face_token
+      User_birthday, User_ccupation, User_type, 
+      User_number, User_face_token, User_recognize
       )
     values (#{userOpenid,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{userSex,jdbcType=VARCHAR}, 
       #{userAge,jdbcType=INTEGER}, #{userHeight,jdbcType=DOUBLE}, #{userWeight,jdbcType=DOUBLE}, 
-      #{userBirthday,jdbcType=DATE}, #{userCcupation,jdbcType=VARCHAR}, #{userFaceToken,jdbcType=VARCHAR}
+      #{userBirthday,jdbcType=DATE}, #{userCcupation,jdbcType=VARCHAR}, #{userType,jdbcType=VARCHAR}, 
+      #{userNumber,jdbcType=VARCHAR}, #{userFaceToken,jdbcType=VARCHAR}, #{userRecognize,jdbcType=TIMESTAMP}
       )
   </insert>
   <insert id="insertSelective" parameterType="cn.cch.healthy.model.Userinfo" >
@@ -79,8 +84,17 @@
       <if test="userCcupation != null" >
         User_ccupation,
       </if>
+      <if test="userType != null" >
+        User_type,
+      </if>
+      <if test="userNumber != null" >
+        User_number,
+      </if>
       <if test="userFaceToken != null" >
         User_face_token,
+      </if>
+      <if test="userRecognize != null" >
+        User_recognize,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -108,8 +122,17 @@
       <if test="userCcupation != null" >
         #{userCcupation,jdbcType=VARCHAR},
       </if>
+      <if test="userType != null" >
+        #{userType,jdbcType=VARCHAR},
+      </if>
+      <if test="userNumber != null" >
+        #{userNumber,jdbcType=VARCHAR},
+      </if>
       <if test="userFaceToken != null" >
         #{userFaceToken,jdbcType=VARCHAR},
+      </if>
+      <if test="userRecognize != null" >
+        #{userRecognize,jdbcType=TIMESTAMP},
       </if>
     </trim>
   </insert>
@@ -140,8 +163,17 @@
       <if test="userCcupation != null" >
         User_ccupation = #{userCcupation,jdbcType=VARCHAR},
       </if>
+      <if test="userType != null" >
+        User_type = #{userType,jdbcType=VARCHAR},
+      </if>
+      <if test="userNumber != null" >
+        User_number = #{userNumber,jdbcType=VARCHAR},
+      </if>
       <if test="userFaceToken != null" >
         User_face_token = #{userFaceToken,jdbcType=VARCHAR},
+      </if>
+      <if test="userRecognize != null" >
+        User_recognize = #{userRecognize,jdbcType=TIMESTAMP},
       </if>
     </set>
     where User_id = #{userId,jdbcType=INTEGER}
@@ -156,7 +188,10 @@
       User_weight = #{userWeight,jdbcType=DOUBLE},
       User_birthday = #{userBirthday,jdbcType=DATE},
       User_ccupation = #{userCcupation,jdbcType=VARCHAR},
-      User_face_token = #{userFaceToken,jdbcType=VARCHAR}
+      User_type = #{userType,jdbcType=VARCHAR},
+      User_number = #{userNumber,jdbcType=VARCHAR},
+      User_face_token = #{userFaceToken,jdbcType=VARCHAR},
+      User_recognize = #{userRecognize,jdbcType=TIMESTAMP}
     where User_id = #{userId,jdbcType=INTEGER}
   </update>
 </mapper>

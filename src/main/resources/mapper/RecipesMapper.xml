@@ -35,8 +35,13 @@
   <select id="getName" resultType="java.lang.String" parameterType="java.lang.Integer">
     select Recipes_name from recipes where Recipes_id = #{recipesId,jdbcType=INTEGER}
   </select>
+
   <select id="findall" resultMap="BaseResultMap">
     select * from recipes
+  </select>
+
+  <select id="getId" parameterType="String" resultType="java.lang.Integer">
+    select Recipes_id from recipes where Recipes_name = #{recipesName,jdbcType=VARCHAR}
   </select>
   
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >

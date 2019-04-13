@@ -2,6 +2,7 @@ package cn.cch.healthy.controller;
 
 import cn.cch.healthy.model.Food;
 import cn.cch.healthy.model.FoodFormula;
+import cn.cch.healthy.model.Recipes;
 import cn.cch.healthy.service.FoodFormulaService;
 import cn.cch.healthy.service.FoodService;
 import cn.cch.healthy.service.RecipesService;

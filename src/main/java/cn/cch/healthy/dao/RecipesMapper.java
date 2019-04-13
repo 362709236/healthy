@@ -22,4 +22,6 @@ public interface RecipesMapper {
     List findall();
 
     String getName(Integer recipesId);
+
+    int getId(String recipesName);
 }

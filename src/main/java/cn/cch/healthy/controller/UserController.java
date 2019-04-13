@@ -4,6 +4,7 @@ import cn.cch.healthy.model.*;
 import cn.cch.healthy.service.*;
 import cn.cch.healthy.util.*;
 
+import org.apache.catalina.User;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +76,6 @@ public class UserController {
                 }else{
                     return "失败";
                 }
-//                User user = new User();
-//                user.setFaceToken(token);
-//              testservice.add(user);
             } catch (Exception e) {
                 // TODO: handle exception
                 e.printStackTrace();
@@ -179,38 +177,6 @@ public class UserController {
         }
         return "成功";
     }
-
-    public String returnpost1(String jsonParams){
-        return jsonParams;
-    }
-
-    public JSONObject returnpost2(JSONObject jsonParams){
-        return jsonParams;
-    }
-
-//    public void interface1(JSONObject object) throws JSONException {
-//        boolean flag = true;
-//        String number = "1";
-//        do {
-//            JSONObject json_map = object.optJSONObject(number);
-//            if (json_map != null){
-//                //获取openid
-//                String smopenid = json_map.getString("openid");
-//                //获取套餐名
-//                String smname = json_map.getString("smname");
-//                //获取菜品
-//                JSONArray array = json_map.getJSONArray("nameList");
-//                if (array.length() != 0){
-//                    for (int i = 0;i<array.length();i++){
-//                        System.out.println(array.get(i));
-//                    }
-//                }
-//                number = String.valueOf(Integer.valueOf(number)+1);
-//            }else{
-//                flag = false;
-//            }
-//        }while (flag);
-//    }
 
     @RequestMapping("GetUserData")
     public HashMap GetUserData(@RequestParam("openid") String openid,@RequestParam("username")String name){
@@ -454,6 +420,130 @@ public class UserController {
         }
     }
 
+    @RequestMapping("updateUserInfo1")
+    public String updateUserInfo1(@RequestParam("openid") String openid,@RequestParam("height") String height,
+                                  @RequestParam("weight") String weight){
+        Double dou_height = Double.valueOf(height);
+        Double dou_weight = Double.valueOf(weight);
+
+        Userinfo user = userinfoService.SelectByOpenid(openid);
+        user.setUserWeight(dou_weight);
+        user.setUserHeight(dou_height);
+        int end = userinfoService.UpdateByPrimaryKeySelective(user);
+
+        if (end == 1){
+            return "成功";
+        }
+        return "失败";
+    }
+
+    @RequestMapping("updateUserInfo2")
+    public String updateUserInfo2(@RequestParam("openid") String openid,@RequestParam("userborn") String birthday,
+                                  @RequestParam("occupation") String occupation) throws ParseException {
+        Userinfo user = userinfoService.SelectByOpenid(openid);
+        if(!(birthday == null || birthday.equals(""))){
+            Date date = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date birthday_date = sdf.parse(birthday);
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(birthday_date);
+            c.add(Calendar.DAY_OF_MONTH, 1);
+            birthday_date = c.getTime();
+
+            int user_year = Integer.parseInt(birthday.substring(0,4));
+            int year = date.getYear()+1900;
+            int age = year - user_year + 1;
+            user.setUserAge(age);
+            user.setUserBirthday(birthday_date);
+        }
+        user.setUserCcupation(occupation);
+
+        int end = userinfoService.UpdateByPrimaryKeySelective(user);
+
+        if (end == 1){
+            return "成功";
+        }
+        return "失败";
+    }
+
+    @RequestMapping("updateUserInfo3")
+    public String updateUserInfo3(@RequestParam("openid") String openid,@RequestParam("userills")String Illness_Str){
+        Userinfo user = userinfoService.SelectByOpenid(openid);
+        int user_id = user.getUserId();
+
+        List<UserIllness> old_UIlist = userIllnessService.SelectByUserid(user_id);
+        ArrayList<Integer> insertList = new ArrayList();
+        ArrayList<Integer> deleteList = new ArrayList();
+        ArrayList<Integer> restList = new ArrayList();
+        HashMap<String, Object> map=new HashMap<String, Object>();
+
+        String[] IllnessArray = Illness_Str.split(",");
+        if (!IllnessArray[0].equals("暂无")){
+            for (int i = 0;i<IllnessArray.length;i++){
+                Illness ill = illnessService.SelectByIllname(IllnessArray[i]);
+                int ill_id = ill.getIllId();
+                insertList.add(ill_id);
+            }
+        }else{
+            userIllnessService.DeleteByUserid(user_id);
+        }
+
+        if (old_UIlist.size() != 0 && IllnessArray.length != 0){
+            for (int i = 0;i<old_UIlist.size();i++){
+                int old_UIid = old_UIlist.get(i).getIllId();
+                deleteList.add(old_UIid);
+                for (int j = 0;j<insertList.size();j++){
+                    if (insertList.get(j) == old_UIid){
+                        restList.add(old_UIid);
+                        deleteList.remove(Integer.valueOf(old_UIid));
+                    }
+                }
+            }
+
+            if (restList.size() != 0){
+                for (int m = 0;m<insertList.size();m++){
+                    int in = insertList.get(m);
+                    for (int n = 0;n<restList.size();n++){
+                        int out = restList.get(n);
+                        if (out==in){
+                            insertList.remove(Integer.valueOf(in));
+                            m--;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (insertList.size() != 0){
+            for (int i = 0;i<insertList.size();i++){
+                int ill_id = insertList.get(i);
+                UserIllness UI = new UserIllness();
+                UI.setIllId(ill_id);
+                UI.setUserId(user_id);
+                userIllnessService.insert(UI);
+            }
+        }
+        if (deleteList.size() != 0){
+            for (int i = 0;i<deleteList.size();i++){
+                int ill_id = deleteList.get(i);
+                UserIllness UI = new UserIllness();
+                UI.setIllId(ill_id);
+                UI.setUserId(user_id);
+                userIllnessService.DeleteByUserIll(UI);
+            }
+        }
+
+        int end = userinfoService.UpdateByPrimaryKeySelective(user);
+
+        if (end == 1){
+            return "成功";
+        }
+        return "失败";
+    }
+
+
     @RequestMapping("ceshi")
     public String ceshi(@RequestParam("openid") String openid){
         if(openid==null||openid.equals("")){
@@ -462,10 +552,6 @@ public class UserController {
             double dou_openid = Double.valueOf(openid);
             System.out.println(dou_openid);
         }
-//        if (){
-//            System.out.println("ssss");
-//        }
-
         System.out.println(openid);
         return "成功";
     }
