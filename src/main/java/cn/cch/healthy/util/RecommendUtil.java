@@ -55,150 +55,6 @@ public class RecommendUtil {
 
     public static RecommendUtil recommendUtil;
 
-    /*
-     * 描述：推荐给用户一个菜谱
-     * */
-    public Map recommend(int userId) throws Exception {
-        Userinfo consumer = recommendUtil.userinfoService.selectByPrimarykey(userId);
-        Date date = new Date();
-        int time=0;
-        double rate=0;
-        if(date.getHours()>=0&&date.getHours()<10)
-        {
-            time = 1;
-            rate = 0.3;
-        }
-        else if(date.getHours()>=10&&date.getHours()<16)
-        {
-            time = 2;
-            rate = 0.35;
-        }
-        else
-            {
-                time = 3;
-                rate = 0.3;
-            }
-
-        //若用户没有填写性别和年龄   就无法推送
-        if (consumer.getUserSex() == null || consumer.getUserAge() == null){
-            return null;
-        }
-
-        StandardIntake intake = recommendUtil.standardIntakeService.getStandardIntake(consumer);
-        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(time);
-        System.out.println(intake);
-        for (int i=0;i<setMealList.size();i++)
-        {
-            System.out.println(setMealList.get(i).toString());
-        }
-        System.out.println("刚开始得到的列表长度"+setMealList.size());
-
-        //通过能量需要筛选
-        for(int i =setMealList.size()-1;i>=0;i--)
-        {
-            if(setMealList.get(i).getSiEnergy()>(intake.getSiEnergy()*rate+energyRange)
-                    ||setMealList.get(i).getSiEnergy()<(intake.getSiEnergy()*rate-energyRange))
-            {
-                System.out.println("目标能量值是:"+setMealList.get(i).getSiEnergy());
-                System.out.println("需要的能量值是:"+(intake.getSiEnergy()*rate-energyRange)+"到"+(intake.getSiEnergy()*rate+energyRange));
-                System.out.println("第"+(i)+"个套餐不满足能量需求而被移除");
-                setMealList.remove(i);
-            }
-        }
-        System.out.println("通过能量需要筛选得到的列表长度"+setMealList.size());
-
-        //通过蛋白质需要筛选
-        for(int i =setMealList.size()-1;i>=0;i--)
-        {
-            if(setMealList.get(i).getSiPortein()>(intake.getSiPortein()*rate+proteinRange)
-                    ||setMealList.get(i).getSiPortein()<(intake.getSiPortein()*rate-proteinRange))
-            {
-                setMealList.remove(i);
-            }
-        }
-        System.out.println("通过蛋白质需要筛选得到的列表长度"+setMealList.size());
-        //通过脂肪需要筛选
-        double fatNeed = intake.getSiEnergy()*0.25*rate;
-        for(int i =setMealList.size()-1;i>=0;i--)
-        {
-            if (setMealList.get(i).getSiEnergy() * 0.25 > (fatNeed + fatRange)
-                    || setMealList.get(i).getSiEnergy() * 0.25 < (fatNeed - fatRange)) {
-                setMealList.remove(i);
-            }
-        }
-        System.out.println("通过脂肪需要筛选得到的列表长度"+setMealList.size());
-        /*//过滤掉近3天推荐过的套餐
-        List<PushInfomation> newestPush = recommendUtil.pushInfoma  我tionService.selectRecentPush(3);
-        for(int i =setMealList.size()-1;i>=0;i--)
-        {
-            for(int j=0;j<newestPush.size();j++)
-            {
-                if(setMealList.get(i).getSmId()==newestPush.get(j).getSmId())
-                    setMealList.remove(i);
-            }
-        }
-        System.out.println("过滤掉近3天推荐过的套餐得到的列表长度"+setMealList.size());*/
-        //过滤掉当前用户禁止食用的套餐
-        List<UserIllness> UINlist = recommendUtil.userIllnessService.SelectByUserid(userId);
-       /* List forbiddenList = getRemoveSetmeal.GetRemoveSetmeal(UINlist);
-        for(int i =setMealList.size()-1;i>=0;i--)
-        {
-
-            for(int j=0;j<forbiddenList.size();j++)
-            {
-                if(setMealList.get(i).getSmId()==forbiddenList.get(i))
-                    setMealList.remove(i);
-            }
-        }*/
-        System.out.println("随机算法之前列表的长度是"+setMealList.size());
-        if(setMealList.size()==0)
-            return new HashMap();
-        /*
-         * 使用alias算法开始抽奖
-         * */
-        List<Adward> adwards = new ArrayList<Adward>();
-        int totalWeight=0;
-        List list=new ArrayList();
-        //设置奖品的名称(套餐id)和权重
-        for(int i=0;i<setMealList.size();i++)
-        {
-            Adward adward = new Adward(setMealList.get(i).getSmId());
-            totalWeight+=adward.getWeight();
-            adwards.add(adward);
-        }
-        //平衡权重，如果有最近刚吃过的菜，权重下降
-        AdwardUtil adwardUtil = new AdwardUtil();
-        List<Map> records = dietRecordService.selectRecentRecord(1, 3, 2);
-        adwards=adwardUtil.balanceWeight(records,adwards);
-        for(int i =0;i<adwards.size();i++)
-        {
-            list.add(adwards.get(i).getWeight()/totalWeight);
-        }
-        AliasUtil method = new AliasUtil(list);
-        int index = method.next();
-        System.out.println("推荐的套餐id是"+adwards.get(index).getSmId());
-        List<SetMeal> setMealContent = recommendUtil.setMealService.SelectBySMid(adwards.get(index).getSmId());
-        Map map = new HashMap();
-        List name = new ArrayList();    
-        String SM_name = setmealInfomationService.FindSMnameByPrimaryKey(setMealContent.get(0).getSmId());
-
-        for(int i=0;i<setMealContent.size();i++)
-        {
-
-            name.add(recommendUtil.recipesService.getName(setMealContent.get(i).getRecipesId()));
-        }
-        map.put("openid",consumer.getUserOpenid());
-        map.put("smname",SM_name);
-        map.put("nameList",name);
-        //添加推送记录
-        PushInfomation pushInfomation = new PushInfomation();
-        pushInfomation.setUserId(consumer.getUserId());
-        pushInfomation.setSmId(adwards.get(index).getSmId());
-        pushInfomation.setPiDate(new Date());
-        pushInfomation.setPiTime(time);
-        recommendUtil.pushInfomationService.addNewPush(pushInfomation);
-        return map;
-    }
     @PostConstruct
     public void init() {
         recommendUtil = this;
@@ -216,7 +72,7 @@ public class RecommendUtil {
         recommendUtil.recipesIllnessService = recipesIllnessService;
     }
     /*
-    * 新的推荐算法
+    * 推荐算法
     * */
     public void recommend_score(int userId) throws Exception {
         Userinfo consumer = recommendUtil.userinfoService.selectByPrimarykey(userId);
@@ -251,7 +107,7 @@ public class RecommendUtil {
         double [] score = new double[setMealList.size()];
         for(int i=0;i<setMealList.size();i++)
         {
-            score[i]=mark(userId,setMealList.get(i),intake,rate,time,eatingRecord);
+            score[i]=mark(consumer,setMealList.get(i),intake,rate,time,eatingRecord);
         }
         //从大到小排序
         double temp;
@@ -275,6 +131,13 @@ public class RecommendUtil {
         {
             System.out.println("套餐"+i+"的最终得分为"+score[i]);
         }
+        //添加推送记录
+        PushInfomation pushInfomation = new PushInfomation();
+        pushInfomation.setUserId(consumer.getUserId());
+        pushInfomation.setSmId(setMealList.get(0).getSmId());
+        pushInfomation.setPiDate(new Date());
+        pushInfomation.setPiTime(time);
+        recommendUtil.pushInfomationService.addNewPush(pushInfomation);
     }
     @Value("${PROTEINWEIGHT}")
     private double PROTEINWEIGHT;
@@ -289,7 +152,7 @@ public class RecommendUtil {
     /*
     * 描述：为一个套餐打分
     * */
-    public double mark(int userId,SetmealInfomation setmeal,StandardIntake intake,double rate,int time,
+    public double mark(Userinfo consumer,SetmealInfomation setmeal,StandardIntake intake,double rate,int time,
                        List<Map> eatingRecord) throws Exception {
         double distance;
         //套餐中的菜品列表
@@ -303,7 +166,8 @@ public class RecommendUtil {
             score_protein=0;
 
         //能量打分
-        distance = Math.abs(setmeal.getSiEnergy()-intake.getSiEnergy()*rate);
+        distance = Math.abs(setmeal.getSiEnergy()-energyFormula(consumer.getUserSex()
+                ,consumer.getUserWeight(),consumer.getUserHeight(),consumer.getUserAge()));
         double score_energy = 10-distance/30;
         if(score_energy<0)
             score_energy=0;
@@ -324,13 +188,13 @@ public class RecommendUtil {
 
         //食堂剩余量打分
         //是否符合用户爱好打分
-        double matchDegree = interestService.match(setmeal.getSmId(),userId)*2;
+        double matchDegree = interestService.match(setmeal.getSmId(),consumer.getUserId())*2;
         double score_match = matchDegree;
         if (score_match>10)
             score_match=10;
 
         //根据用户当前疾病打分
-        List<Integer> illness = userIllnessService.SelectByUserid(userId);
+        List<Integer> illness = userIllnessService.SelectByUserid(consumer.getUserId());
             //用户当前禁止吃的食材列表
         List<Integer> forbbiden_food = new ArrayList<Integer>();
         for (int i=0;i<illness.size();i++)
@@ -373,5 +237,15 @@ public class RecommendUtil {
                 +score_recent*RECENTWEIGHT+score_match*INTERESTWEIGHT+
                 score_illness*ILLNESSWEIGHT;
         return finalScore;
+    }
+
+    private double energyFormula(String sex,double weight,double height,int age)
+    {
+        if (sex.equals('男'))
+            return 66+13.7*weight+5*height+6.8*age;
+        else if(sex.equals('女'))
+            return 655+9.6*weight+1.8*height+4.7*age;
+        else
+            return -1;
     }
 }
