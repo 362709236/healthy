@@ -171,7 +171,7 @@ public class RecommendUtil {
         double score_energy = 10-distance/30;
         if(score_energy<0)
             score_energy=0;
-
+        System.out.println(("营养素打分完成！"));
         //近期是否吃过相同菜品打分
         double deScore=0;
         for(int i=0;i<recipeList.size();i++)
@@ -185,14 +185,14 @@ public class RecommendUtil {
         double score_recent = 10-deScore;
         if(score_recent<0)
             score_recent=0;
-
+        System.out.println("近期吃过的菜品打分完成！");
         //食堂剩余量打分
         //是否符合用户爱好打分
         double matchDegree = interestService.match(setmeal.getSmId(),consumer.getUserId())*2;
         double score_match = matchDegree;
         if (score_match>10)
             score_match=10;
-
+        System.out.println("食堂剩余量打分完成！");
         //根据用户当前疾病打分
         List<Integer> illness = userIllnessService.SelectByUserid(consumer.getUserId());
             //用户当前禁止吃的食材列表
@@ -232,10 +232,12 @@ public class RecommendUtil {
         }
         if (score_illness>10)
             score_illness=10;
+        System.out.println("用户疾病打分完成！");
         //计算最终得分
         double finalScore=score_protein*PROTEINWEIGHT+score_energy*ENERGYWEIGHT
                 +score_recent*RECENTWEIGHT+score_match*INTERESTWEIGHT+
-                score_illness*ILLNESSWEIGHT;
+                0*ILLNESSWEIGHT;
+        System.out.println("---------------打分成功-----------------");
         return finalScore;
     }
 

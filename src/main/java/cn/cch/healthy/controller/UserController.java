@@ -157,17 +157,17 @@ public class UserController {
                 boolean isExit=FaceUtil.compare(userList.get(j).getUserFaceToken(),faceList.get(i));
                 if(isExit){
                     //推送内容
-                    map=recommendUtil.recommend(userList.get(j).getUserId());
-                    JSONObject JSONmap = new JSONObject(map);
-                    HttpTest.appadd(JSONmap);
-                    String transJson = JSONmap.toString();
+                    //map=recommendUtil.recommend_score(userList.get(j).getUserId());
+                    //JSONObject JSONmap = new JSONObject(map);
+                   // HttpTest.appadd(JSONmap);
+                    //String transJson = JSONmap.toString();
 //                    String result = OkHttpUtil.postJsonParams("http://47.101.179.98/wechat/returnpost2",transJson);
 //                    String result = OkHttpUtil.postJsonParams("http://localhost:8081/demo2/demo",transJson);
 //                    String str = OkHttpUtil.doPostHttpRequest("http://localhost:8081/demo2/demo", map.toString());
 //                    String json = JSON.toJSONString(map,true);
 //                    com.alibaba.fastjson.JSONObject ob = JSON.parseObject(json);
-                    System.out.println(JSONmap);
-                    System.out.println(transJson);
+                    //System.out.println(JSONmap);
+                    //System.out.println(transJson);
                     System.out.println("------------------");
 //                    System.out.println("retuenstr:"+str);
 //                    System.out.println("retuenstr:"+retuenstr.toString());

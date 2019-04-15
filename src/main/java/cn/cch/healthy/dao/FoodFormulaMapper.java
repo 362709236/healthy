@@ -23,5 +23,7 @@ public interface FoodFormulaMapper {
 
     List selectByFoodid(int foodId);
 
+    List selectRecipesByFoodid(int foodId);
+
     int deleteByRecipesId(int recipesId);
 }
