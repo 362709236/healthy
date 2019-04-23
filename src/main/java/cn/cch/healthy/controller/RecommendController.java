@@ -9,10 +9,7 @@ import cn.cch.healthy.util.RecommendUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -43,11 +40,11 @@ public class RecommendController {
     * 描述：测试接口
     * */
     @ResponseBody
-    @RequestMapping("/test")
-    public String test() throws Exception {
+    @RequestMapping(value = "/test",method = RequestMethod.POST)
+    public Map test(@RequestParam("userId") String userId) throws Exception {
         //List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(2);
-        recommendUtil.recommend_score(1);
-        return "";
+
+        return recommendUtil.recommend_score(Integer.parseInt(userId));
     }
     /*
     * 测试接口

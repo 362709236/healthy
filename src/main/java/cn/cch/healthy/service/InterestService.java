@@ -50,4 +50,8 @@ public class InterestService {
         }
         return false;
     }
+    /*
+     * 根据标签名查询标签id
+     */
+    public int selectIdByName(String name){return mapper.selectIdByName(name);}
 }

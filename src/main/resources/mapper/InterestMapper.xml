@@ -14,6 +14,12 @@
     from interest
     where Interest_id = #{interestId,jdbcType=INTEGER}
   </select>
+  <select id="selectIdByName" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    Interest_id
+    from interest
+    where Interest_name = #{name,jdbcType=STRING}
+  </select>
   <select id="selectAll" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />

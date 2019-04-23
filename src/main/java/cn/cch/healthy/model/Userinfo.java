@@ -132,4 +132,23 @@ public class Userinfo {
     public void setUserRecognize(Date userRecognize) {
         this.userRecognize = userRecognize;
     }
+
+    @Override
+    public String toString() {
+        return "Userinfo{" +
+                "userId=" + userId +
+                ", userOpenid='" + userOpenid + '\'' +
+                ", userName='" + userName + '\'' +
+                ", userSex='" + userSex + '\'' +
+                ", userAge=" + userAge +
+                ", userHeight=" + userHeight +
+                ", userWeight=" + userWeight +
+                ", userBirthday=" + userBirthday +
+                ", userCcupation='" + userCcupation + '\'' +
+                ", userType='" + userType + '\'' +
+                ", userNumber='" + userNumber + '\'' +
+                ", userFaceToken='" + userFaceToken + '\'' +
+                ", userRecognize=" + userRecognize +
+                '}';
+    }
 }

@@ -44,13 +44,11 @@ public class DietRecordService {
             Date date2 = new Date();
             long dayNum =  daysOfTwo_2(date1,date2);
             dayNum++;
-           // System.out.println("和今天相差"+dayNum+"天");
+            System.out.println("和今天相差"+dayNum+"天");
             for (int j=0;j<list.size();j++)
             {
                 Map map = new HashMap();
                 map.put("recipeId",list.get(j));
-                if(list.get(j)==44)
-                    dayNum=-1;
                 if(dayNum==1)
                     map.put("deWeight",oneDeWeight);
                 else if (dayNum==2)
@@ -58,6 +56,8 @@ public class DietRecordService {
                 else if (dayNum==3)
                     map.put("deWeight",threeDeWeight);
                 else
+                    map.put("deWeight",0);
+                if(list.get(j)==44)
                     map.put("deWeight",0);
                 recordMap.add(map);
             }

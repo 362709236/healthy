@@ -24,4 +24,8 @@ public interface RecipesMapper {
     String getName(Integer recipesId);
 
     int getId(String recipesName);
+
+    List<Recipes> getRecipesByType(String typeTag);
+
+    String getTypeByid(Integer recipesId);
 }

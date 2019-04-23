@@ -31,9 +31,34 @@ public class SetmealController {
     @Autowired
     SetMealService setMealService;
 
+    @Autowired
+    InterestService interestService;
+
+    @Autowired
+    SetmealInterestService setmealInterestService;
+
+    //套餐自动生成
+    @RequestMapping("autoForm")
+    public String autoForm()
+    {
+        List<Recipes> meatDishList =recipesService.getRecipesByType("荤菜");
+        List<Recipes> vegeDishList = recipesService.getRecipesByType("素菜");
+       /* for (int i=0;i<meatDishList.size();i++)
+        {
+            System.out.println(meatDishList.get(i).getRecipesName());
+        }
+        for (int i=0;i<vegeDishList.size();i++)
+        {
+            System.out.println(vegeDishList.get(i).getRecipesName());
+        }*/
+        int id=insertSM("中餐1");
+        System.out.println("新增的套餐id为"+id);
+        return "成功！";
+    }
+
     //新增套餐
-    @RequestMapping("insert")
-    public String insertSM(@RequestParam("name") String name){
+    //@RequestMapping("insert")
+    public int insertSM(String name){
         SetmealInfomation SmI = new SetmealInfomation();
         SmI.setSmName(name);
         SmI.setRightTime(0);
@@ -51,7 +76,8 @@ public class SetmealController {
         SmI.setSiMg(0);
         SmI.setSiZn(0);
         setmealInfomationService.insert(SmI);
-        return "成功！";
+        int id = SmI.getSmId();
+        return id;
     }
 
     @RequestMapping("shiyan")
@@ -61,9 +87,9 @@ public class SetmealController {
     }
 
     //搭配套餐
-    @RequestMapping("update")
-    public String updateSM(@RequestParam("RecipesArray") int[] RecipesArray,@RequestParam("SMid")int SM_id,
-                           @RequestParam("Righttime")int Righttime){
+   // @RequestMapping("update")
+    public String updateSM(int[] RecipesArray,int SM_id,
+                           int Righttime){
         List<SetMeal> old_SmIlist = setMealService.SelectBySMid(SM_id);
         ArrayList<Integer> insertList = new ArrayList();
         ArrayList<Integer> deleteList = new ArrayList();
@@ -121,6 +147,10 @@ public class SetmealController {
                 SM.setRecipesId(insertRecipesId);
                 SM.setSmId(SM_id);
                 setMealService.Insert(SM);
+
+                //添加标签
+                String tags[]=recipesService.getTypeByid(insertRecipesId).split(",");
+               // for(int j=0)
             }
         }
         if (deleteList.size() != 0){
@@ -130,6 +160,8 @@ public class SetmealController {
                 SM.setRecipesId(deleteRecipesId);
                 SM.setSmId(SM_id);
                 setMealService.DeleteByRecipesId(SM);
+
+                //删除标签
             }
         }
 
