@@ -15,7 +15,6 @@ public interface SetMealMapper {
 
     SetMeal selectByPrimaryKey(Integer smNumber);
 
-
     int updateByPrimaryKeySelective(SetMeal record);
 
     int updateByPrimaryKey(SetMeal record);

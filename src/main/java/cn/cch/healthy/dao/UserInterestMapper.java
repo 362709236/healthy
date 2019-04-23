@@ -20,4 +20,8 @@ public interface UserInterestMapper {
     int updateByPrimaryKeySelective(UserInterest record);
 
     int updateByPrimaryKey(UserInterest record);
+
+    int deleteByuserId(int userId);
+
+    int deleteByUserInterest(UserInterest record);
 }

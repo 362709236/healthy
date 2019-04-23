@@ -54,12 +54,6 @@ public class SetmealController {
         return "成功！";
     }
 
-    @RequestMapping("shiyan")
-    public int shiyan1(@RequestParam("Righttime") int Righttime){
-        System.out.println(Righttime);
-        return 0;
-    }
-
     //搭配套餐
     @RequestMapping("update")
     public String updateSM(@RequestParam("RecipesArray") int[] RecipesArray,@RequestParam("SMid")int SM_id,

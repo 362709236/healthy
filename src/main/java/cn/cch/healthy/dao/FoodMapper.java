@@ -18,4 +18,6 @@ public interface FoodMapper {
     int updateByPrimaryKey(Food record);
 
     int getId(String foodName);
+
+    Food selectByName(String foodName);
 }

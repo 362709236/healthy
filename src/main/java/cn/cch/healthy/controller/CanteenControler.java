@@ -2,13 +2,18 @@ package cn.cch.healthy.controller;
 
 import cn.cch.healthy.model.*;
 import cn.cch.healthy.service.*;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Map.Entry;
 
 /*
  * 食堂接口
@@ -39,21 +44,6 @@ public class CanteenControler {
     /*
     * 菜谱配方接口
     * */
-    @RequestMapping("insertFormula")
-    public String insertFormula(@RequestParam("FoodId") int FoodId,@RequestParam("RecipesId") int RecipesId,
-                                @RequestParam("FoodNumber") String FoodNumber){
-        Double foodnumber = Double.valueOf(FoodNumber);
-        FoodFormula FF = new FoodFormula();
-        FF.setRecipesId(RecipesId);
-        FF.setFoodId(FoodId);
-        FF.setFoodNumber(foodnumber);
-        int end = foodFormulaService.insert(FF);
-        if (end == 1){
-            return "成功";
-        }
-        return "失败";
-    }
-
     @RequestMapping("deleteFormula")
     public String deleteFormula(@RequestParam("FormulaId") int FormulaId){
         int end = foodFormulaService.DeleteByPrimaryKey(FormulaId);
@@ -63,21 +53,9 @@ public class CanteenControler {
         return "失败";
     }
 
-    @RequestMapping("updateFormula")
-    public String updateFormula(@RequestParam("FormulaId") int FormulaId,@RequestParam("FoodId") int FoodId,
-    @RequestParam("FoodNumber") String FoodNumber){
-        double foodnumber = Double.valueOf(FoodNumber);
-        FoodFormula FF = new FoodFormula();
-        FF.setFfId(FormulaId);
-        FF.setFoodId(FoodId);
-        FF.setFoodNumber(foodnumber);
-        int end = foodFormulaService.UpdateByPrimaryKeySelective(FF);
-        if (end == 1){
-            return "成功";
-        }
-        return "失败";
-    }
-
+    /*
+    * 搜索某样菜品的配方信息
+    * */
     @RequestMapping("selectRecipesFormula")
     public List selectRecipesFormula(@RequestParam("RecipesId") int RecipesId){
         List<FoodFormula> FFlist = foodFormulaService.SelectByRecipesId(RecipesId);
@@ -134,7 +112,7 @@ public class CanteenControler {
                 map.put("recipes_name",recipes_name);
                 resultlist.add(map);
             }
-            return setmealList;
+            return resultlist;
         }
 
         return null;
@@ -160,33 +138,183 @@ public class CanteenControler {
         return "失败";
     }
 
+    /*
+    * 更新所有菜品的营养信息
+    * */
+    @RequestMapping("updateRecipesData")
+    public void updateRecipesData(){
+        List<Recipes> RecipesList = recipesService.Findall();
+        for (int i = 0;i<RecipesList.size();i++){
+            int Recipes_id = RecipesList.get(i).getRecipesId();
+
+            //营养含量值
+            double Food_fat = 0;
+            double Food_protein = 0;
+            double Food_energy = 0;
+            double Food_vitamin_A = 0;
+            double Food_vitamin_B_1 = 0;
+            double Food_vitamin_B_2 = 0;
+            double Food_vitamin_C = 0;
+            double Food_vitamin_E = 0;
+            double Food_Ca = 0;
+            double Food_Mg = 0;
+            double Food_Fe = 0;
+            double Food_Zn = 0;
+            double Food_cholesterol = 0;
+
+            List<FoodFormula> foodFormulaList = foodFormulaService.SelectByRecipesId(Recipes_id);
+            for (int n = 0;n<foodFormulaList.size();n++){
+                int Foodid = foodFormulaList.get(n).getFoodId();
+                double Foodnumber = foodFormulaList.get(n).getFoodNumber();
+                Food food = foodService.selectByPrimaryKey(Foodid);
+
+                //计算套餐营养含量
+                Food_fat += food.getFoodFat()*9*Foodnumber;
+                Food_protein += food.getFoodProtein()*Foodnumber;
+                Food_energy += food.getFoodEnergy()*Foodnumber;
+                Food_vitamin_A += food.getFoodVitaminA()*Foodnumber;
+                Food_vitamin_B_1 += food.getFoodVitaminB1()*Foodnumber;
+                Food_vitamin_B_2 += food.getFoodVitaminB2()*Foodnumber;
+                Food_vitamin_C += food.getFoodVitaminC()*Foodnumber;
+                Food_vitamin_E += food.getFoodVitaminE()*Foodnumber;
+                Food_Ca += food.getFoodCa()*Foodnumber;
+                Food_Mg += food.getFoodMg()*Foodnumber;
+                Food_Fe += food.getFoodFe()*Foodnumber;
+                Food_Zn += food.getFoodZn()*Foodnumber;
+                Food_cholesterol += food.getFoodCholesterol()*Foodnumber;
+            }
+
+            Recipes recipes = new Recipes();
+            recipes.setRecipesId(Recipes_id);
+            recipes.setRecipesFat(Food_fat/3);
+            recipes.setRecipesProtein(Food_protein/3);
+            recipes.setRecipesEnergy(Food_energy/3);
+            recipes.setRecipesVitaminA(Food_vitamin_A/3);
+            recipes.setRecipesVitaminB1(Food_vitamin_B_1/3);
+            recipes.setRecipesVitaminB2(Food_vitamin_B_2/3);
+            recipes.setRecipesVitaminC(Food_vitamin_C/3);
+            recipes.setRecipesVitaminE(Food_vitamin_E/3);
+            recipes.setRecipesCa(Food_Ca/3);
+            recipes.setRecipesMg(Food_Mg/3);
+            recipes.setRecipesFe(Food_Fe/3);
+            recipes.setRecipesZn(Food_Zn/3);
+            recipes.setRecipesCholesterol(Food_cholesterol/3);
+            recipesService.UpdateByPrimaryKeySelective(recipes);
+        }
+    }
+
     @RequestMapping("deleteRecipes")
     public String deleteRecipes(@RequestParam("Recipes_id") int Recipes_id){
         int end1 = recipesService.DeleteByPrimaryKey(Recipes_id);
         int end2 = foodFormulaService.DeleteByRecipesId(Recipes_id);
+        List<SetMeal> smlist = setMealService.SelectByRecipesid(Recipes_id);
+        int i = 0;
+        while (i<smlist.size()){
+            int smid = smlist.get(i).getSmId();
+            int end3 = setmealInfomationService.DeleteByPrimaryKey(smid);
+            if (end3 != 1){
+                return "失败";
+            }
+            i++;
+        }
         if (end1 == 1 && end2 == 1){
             return "成功";
         }
         return "失败";
     }
 
+    /*
+    * 删除文件
+    * */
+    public static boolean deleteFile(String fileName) {
+        File file = new File(fileName);
+        // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+        if (file.exists() && file.isFile()) {
+            if (file.delete()) {
+                System.out.println("删除单个文件" + fileName + "成功！");
+                return true;
+            } else {
+                System.out.println("删除单个文件" + fileName + "失败！");
+                return false;
+            }
+        } else {
+            System.out.println("删除单个文件失败：" + fileName + "不存在！");
+            return false;
+        }
+    }
+
+    /*
+    * 上传文件
+    * */
+    public static String upload(MultipartFile file,String name) throws IOException {
+        if (!file.isEmpty()) {
+            String fileName=file.getOriginalFilename();
+            // 获取文件的后缀名
+            String suffixName = fileName.substring(fileName.lastIndexOf("."));
+            // 文件上传后的路径
+            String filePath = "F:/heathyimg/";
+            // 解决中文问题，liunx下中文路径，图片显示问题
+            String realfile = filePath + name + suffixName;
+            File dest = new File(realfile);
+
+            // 检测是否存在目录
+            if (!dest.getParentFile().exists()) {
+                dest.getParentFile().mkdirs();
+            }else if(dest.exists()){
+                deleteFile(realfile);
+            }
+            try {
+                file.transferTo(dest);
+                return name + suffixName;
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return "fail";
+    }
+
+    /*
+    *食堂接口
+    * */
     @RequestMapping("updateRecipes")
-    public String updateRecipes(@RequestParam("Recipes_id") int Recipes_id,
-                                    @RequestParam("Recipes_name") String Recipes_name,
-                                @RequestParam("Recipes_margin") String Recipes_margin){
-        Recipes recipes = recipesService.SelectByPrimaryKey(Recipes_id);
-        recipes.setRecipesName(Recipes_name);
-        recipes.setRecipesMargin(Double.valueOf(Recipes_margin));
-        int end = recipesService.UpdateByPrimaryKeySelective(recipes);
+    public String updateRecipes(@RequestParam("Recipes_name") String Recipes_name,
+                                @RequestParam("file") MultipartFile file,
+                                @RequestParam("Recipes_price") String Recipes_price,
+                                @RequestParam("Recipes_margin") String Recipes_margin) throws IOException {
+        Recipes haverecipes = recipesService.SelectByName(Recipes_name);
+        String Recipes_img = upload(file,Recipes_name);
+        if (Recipes_img.equals("fail")){
+            return "文件上传失败";
+        }
+
+        if (haverecipes == null){
+            Recipes recipes = new Recipes();
+            recipes.setRecipesName(Recipes_name);
+            //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8080/Img/xxxx.jpg
+            recipes.setRecipesImg(Recipes_img);
+            recipes.setRecipesPrice(Double.valueOf(Recipes_price));
+            recipes.setRecipesMargin(Double.valueOf(Recipes_margin));
+            recipesService.insert(recipes);
+            return "成功";
+        }
+        haverecipes.setRecipesName(Recipes_name);
+        haverecipes.setRecipesImg(Recipes_img);
+        haverecipes.setRecipesPrice(Double.valueOf(Recipes_price));
+        haverecipes.setRecipesMargin(Double.valueOf(Recipes_margin));
+        int end = recipesService.UpdateByPrimaryKeySelective(haverecipes);
         if (end == 1){
             return "成功";
         }
         return "失败";
     }
 
-    public String selectRecipes(){
-
-        return "";
+    //模糊查询
+    @RequestMapping("VagueSelectRecipes")
+    public List<Recipes> VagueSelectRecipes(@RequestParam("Recipes_name") String Recipes_name){
+        List<Recipes> recipesList = recipesService.VagueSelectRecipes(Recipes_name);
+        return recipesList;
     }
 
     @RequestMapping("selectAllRecipes")
@@ -199,11 +327,85 @@ public class CanteenControler {
     * 食堂饮食记录接口
     * */
 
-    public String selectDietRecord(){
+    /*
+    * 获得热销菜品
+    * */
+    @RequestMapping("GetSellWellRecipes")
+    public List<Recipes> GetSellWellRecipes(){
+        List<DietRecord> DRlist = dietRecordService.SelectMonthDiet();
+        List<Map> list = new ArrayList<>();
+        int i = 0;
+        while (i < DRlist.size()){
+            int DR_id = DRlist.get(i).getDrId();
+            List<Integer> recipesIdList = dietRecordService.SelectByDRid(DR_id);
+            int j = 0;
+            while (j < recipesIdList.size()){
+                Map<Integer,Integer> map = new HashMap<>();
+                map.put(recipesIdList.get(j),1);
+                list.add(map);
+                j++;
+            }
+            i++;
+        }
 
-        return "";
+        Map m = mapCombine(list);
+        Map<Integer, Integer> finalmap = new TreeMap<Integer, Integer>();
+        Set<Integer> set = m.keySet(); //取出所有的key值
+        for (Integer key:set) {
+            List newList = new ArrayList<>();
+            newList = (List) m.get(key);
+            int lenght = newList.size();
+            finalmap.put(key,lenght);
+        }
+        //这里将map.entrySet()转换成list
+        List<Map.Entry<Integer,Integer>> list1 = new ArrayList<Map.Entry<Integer,Integer>>(finalmap.entrySet());
+        //然后通过比较器来实现排序
+        Collections.sort(list1,new Comparator<Map.Entry<Integer,Integer>>() {
+            //降序排序
+            public int compare(Entry<Integer, Integer> o1,
+                               Entry<Integer, Integer> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+
+        int number = 1;
+        List<Recipes> resultList = new ArrayList<>();
+        //取前十热销
+        for(Map.Entry<Integer,Integer> mapping:list1){
+//            System.out.println(mapping.getKey()+":"+mapping.getValue());
+            if (number>10){
+                break;
+            }
+            int recipes_id = mapping.getKey();
+            Recipes recipes = recipesService.SelectByPrimaryKey(recipes_id);
+            resultList.add(recipes);
+            number++;
+        }
+        return resultList;
     }
 
+    public static Map mapCombine(List<Map> list) {
+        Map<Object, List> map = new HashMap<>();
+        for (Map m : list) {
+            Iterator<Object> it = m.keySet().iterator();
+            while (it.hasNext()) {
+                Object key = it.next();
+                if (!map.containsKey(key)) {
+                    List newList = new ArrayList<>();
+                    newList.add(m.get(key));
+                    map.put(key, newList);
+                } else {
+                    map.get(key).add(m.get(key));
+                }
+            }
+        }
+        return map;
+    }
+
+    /*
+    * 显示某次交易
+    * 菜品列表
+    * */
     @RequestMapping("selectAllDietRecordSub")
     public List selectAllDietRecordSub(@RequestParam("DR_id") int DR_id){
         List<DietRecord_Sub> DRSlist = dietRecordService.SelectByDRid(DR_id);
@@ -215,6 +417,10 @@ public class CanteenControler {
         }
         return resultlist;
     }
+
+    /*
+    *
+    * */
     @RequestMapping("selectAllDietRecord")
     public List selectAllDietRecord(){
         List<DietRecord> DRlist = dietRecordService.selectAll();
@@ -223,6 +429,7 @@ public class CanteenControler {
         while (i<DRlist.size()){
             int DR_id = DRlist.get(i).getDrId();
             resultlist.add(DR_id);
+            i++;
         }
         return resultlist;
     }
@@ -331,14 +538,94 @@ public class CanteenControler {
                 foodFormulaService.UpdateByPrimaryKeySelective(fflist.get(i));
                 return "成功";
             }
+            i++;
         }
 
         FoodFormula ff = new FoodFormula();
         ff.setFoodNumber(Double.valueOf(food_number));
         ff.setFoodId(food_id);
         ff.setRecipesId(recipes_id);
-        foodFormulaService.insert(ff);
-        return "成功";
+        int end = foodFormulaService.insert(ff);
+        if (end == 1){
+            return "成功";
+        }
+        return "失败";
+    }
+
+    /*
+    * 设置食材信息
+    * */
+    @RequestMapping("Makefood")
+    public String Makefood(@RequestParam("Food_name") String Food_name,@RequestParam("Food_fat") String Food_fat,
+                           @RequestParam("Food_protein") String Food_protein,@RequestParam("Food_energy") String Food_energy,
+                           @RequestParam("Food_vitamin_A") String Food_vitamin_A,@RequestParam("Food_vitamin_B_1") String Food_vitamin_B_1,
+                           @RequestParam("Food_vitamin_B_2") String Food_vitamin_B_2,@RequestParam("Food_vitamin_C") int Food_vitamin_C,
+                           @RequestParam("Food_vitamin_E") String Food_vitamin_E,@RequestParam("Food_Ca") String Food_Ca,
+                           @RequestParam("Food_Mg") String Food_Mg,@RequestParam("Food_Fe") String Food_Fe,
+                           @RequestParam("Food_Zn") String Food_Zn,@RequestParam("Food_cholesterol") String Food_cholesterol){
+        Food havefood = foodService.SelectByName(Food_name);
+        Food food = new Food();
+        if (havefood == null){
+            food.setFoodFat(Double.valueOf(Food_fat));
+            food.setFoodProtein(Double.valueOf(Food_protein));
+            food.setFoodEnergy(Double.valueOf(Food_energy));
+            food.setFoodVitaminA(Double.valueOf(Food_vitamin_A));
+            food.setFoodVitaminB1(Double.valueOf(Food_vitamin_B_1));
+            food.setFoodVitaminB2(Double.valueOf(Food_vitamin_B_2));
+            food.setFoodVitaminC(Food_vitamin_C);
+            food.setFoodVitaminE(Double.valueOf(Food_vitamin_E));
+            food.setFoodCa(Double.valueOf(Food_Ca));
+            food.setFoodMg(Double.valueOf(Food_Mg));
+            food.setFoodFe(Double.valueOf(Food_Fe));
+            food.setFoodZn(Double.valueOf(Food_Zn));
+            food.setFoodCholesterol(Double.valueOf(Food_cholesterol));
+            int end = foodService.insert(food);
+            if (end == 1){
+                return "成功";
+            }
+            return "失败";
+        }else{
+            food.setFoodId(havefood.getFoodId());
+            food.setFoodFat(Double.valueOf(Food_fat));
+            food.setFoodProtein(Double.valueOf(Food_protein));
+            food.setFoodEnergy(Double.valueOf(Food_energy));
+            food.setFoodVitaminA(Double.valueOf(Food_vitamin_A));
+            food.setFoodVitaminB1(Double.valueOf(Food_vitamin_B_1));
+            food.setFoodVitaminB2(Double.valueOf(Food_vitamin_B_2));
+            food.setFoodVitaminC(Food_vitamin_C);
+            food.setFoodVitaminE(Double.valueOf(Food_vitamin_E));
+            food.setFoodCa(Double.valueOf(Food_Ca));
+            food.setFoodMg(Double.valueOf(Food_Mg));
+            food.setFoodFe(Double.valueOf(Food_Fe));
+            food.setFoodZn(Double.valueOf(Food_Zn));
+            food.setFoodCholesterol(Double.valueOf(Food_cholesterol));
+            int end = foodService.UpdateByPrimaryKeySelective(food);
+            if (end == 1){
+                return "成功";
+            }else{
+                return "失败";
+            }
+        }
+    }
+
+    @RequestMapping("deletefood")
+    public String deletefood(@RequestParam("Food_id") int Food_id){
+        int end = foodService.DeleteByPrimaryKey(Food_id);
+        if (end == 1){
+            return "成功";
+        }else{
+            return "失败";
+        }
+    }
+
+    @RequestMapping("ceshi")
+    public void ceshi(){
+        Food food_id = foodService.SelectByName("糖");
+        if (food_id == null){
+            food_id.setFoodCa(1.1);
+            System.out.println(food_id.getFoodCa());
+        }
+        System.out.println(food_id);
     }
 
 }

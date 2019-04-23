@@ -21,6 +21,18 @@
     from userinterest
     where User_id = #{userId,jdbcType=INTEGER}
   </select>
+
+  <delete id="deleteByuserId" parameterType="java.lang.Integer">
+    delete from userinterest
+    where User_id = #{userId,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteByUserInterest" parameterType="cn.cch.healthy.model.UserInterest">
+    delete from userinterest
+    where User_id = #{userId,jdbcType=INTEGER} and
+    Interest_id = #{interestId,jdbcType=INTEGER}
+  </delete>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from userinterest
     where UI_id = #{uiId,jdbcType=INTEGER}

@@ -26,4 +26,10 @@ public class RecipesService {
     public int DeleteByPrimaryKey(int id){ return mapper.deleteByPrimaryKey(id); }
 
     public int GetId(String recipesName){ return mapper.getId(recipesName); }
+
+    public List VagueSelectRecipes(String recipesName){ return mapper.vagueSelectRecipes(recipesName); }
+
+    public Recipes SelectByName(String recipesName){ return mapper.selectByName(recipesName); }
+
+    public List<String> SelectByType(String recipesType){ return mapper.selectByType(recipesType); }
 }

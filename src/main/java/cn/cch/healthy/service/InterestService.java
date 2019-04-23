@@ -3,6 +3,7 @@ package cn.cch.healthy.service;
 import cn.cch.healthy.dao.InterestMapper;
 import cn.cch.healthy.dao.Setmeal_InterestMapper;
 import cn.cch.healthy.dao.UserInterestMapper;
+import cn.cch.healthy.model.Interest;
 import cn.cch.healthy.model.UserInterest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,4 +51,16 @@ public class InterestService {
         }
         return false;
     }
+
+    public int GetID(String name){ return mapper.getID(name); }
+
+    public int insertuserInterest(UserInterest UI){ return userInterestMapper.insert(UI); }
+
+    public int UpdateuserInterest(UserInterest UI){ return userInterestMapper.updateByPrimaryKeySelective(UI); }
+
+    public List<Integer> SelectByUserId(int userId){ return userInterestMapper.selectByUserId(userId); }
+
+    public int DeleteByuserId(int userId){ return userInterestMapper.deleteByuserId(userId); }
+
+    public int DeleteByUserInterest(UserInterest UI){ return  userInterestMapper.deleteByUserInterest(UI); }
 }

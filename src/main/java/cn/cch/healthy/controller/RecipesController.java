@@ -26,7 +26,7 @@ public class RecipesController {
     FoodService foodService;
 
 
-    @RequestMapping("update")
+    @RequestMapping("updateRecipesData")
     public void updateRecipesData(){
         List<Recipes> RecipesList = recipesService.Findall();
         for (int i = 0;i<RecipesList.size();i++){

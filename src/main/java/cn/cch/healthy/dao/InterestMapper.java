@@ -20,4 +20,6 @@ public interface InterestMapper {
     int updateByPrimaryKey(Interest record);
 
     List selectAll();
+
+    int getID(String interestName);
 }

@@ -83,4 +83,12 @@ public class DietRecordService {
     public int insertsub(DietRecord_Sub DR_sub){ return subMapper.insert(DR_sub); }
 
     public List selectAll(){ return mapper.selectAll(); }
+
+    public List SelectByUserid(int userId){ return mapper.selectByUserid(userId); }
+
+    public List SelectUserWeekDiet(int userId){ return mapper.selectUserWeekDiet(userId); }
+
+    public List SelectMonthDiet(){ return mapper.selectMonthDiet(); }
+
+    public List GetUserWeeklySQL(String date1,String date2,int userId){ return mapper.GetUserWeekly(date1,date2,userId);}
 }
