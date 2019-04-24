@@ -4,6 +4,7 @@ import cn.cch.healthy.model.*;
 import cn.cch.healthy.service.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,6 +41,26 @@ public class CanteenControler {
 
     @Autowired
     FoodService foodService;
+
+    @PostMapping("/getsell")
+    public Map getsell() {
+        String legend[]={"糖醋排骨","粉蒸肉","京酱肉丝","东坡肉","红烧鸡块","宫保鸡丁","剁椒鱼头"};
+        String zao[]={"糖醋排骨","粉蒸肉"};
+        String wu[]={"京酱肉丝","东坡肉","红烧鸡块"};
+        String wan[]={"红烧鸡块","宫保鸡丁","剁椒鱼头"};
+        int data[][]={{112, 223, 111, 154, 190, 30, 10},{12, 234, 125, 452, 190, 330, 410,201},{121, 17, 111, 154, 190, 330, 410},{25, 23, 111, 25, 190, 330, 410},{12, 7, 25, 556, 23, 44, 450},
+                {233, 111, 22, 33, 44, 22, 678},{325, 222, 633, 554, 190, 330, 410}};
+        int totaldata[][]={{123, 13, 313, 133, 131, 221, 410},{12, 23, 111, 3, 3, 33, 111},{12, 23, 13, 154, 190, 132, 522}};
+        Map mymap=new HashMap();
+        mymap.put("legend",legend);
+        mymap.put("zao",zao);
+        mymap.put("wu",wu);
+        mymap.put("wan",wan);
+        mymap.put("data",data);
+        mymap.put("totaldata",totaldata);
+        return mymap;
+    }
+
 
     /*
     * 菜谱配方接口
@@ -279,31 +300,34 @@ public class CanteenControler {
     *食堂接口
     * */
     @RequestMapping("updateRecipes")
-    public String updateRecipes(@RequestParam("Recipes_name") String Recipes_name,
+    public String updateRecipes(@RequestParam("Recipes_id") int Recipes_id,
+                                @RequestParam("Recipes_name") String Recipes_name,
                                 @RequestParam("file") MultipartFile file,
                                 @RequestParam("Recipes_price") String Recipes_price,
                                 @RequestParam("Recipes_margin") String Recipes_margin) throws IOException {
-        Recipes haverecipes = recipesService.SelectByName(Recipes_name);
-        String Recipes_img = upload(file,Recipes_name);
+//        Recipes haverecipes = recipesService.SelectByName(Recipes_name);
+        Recipes recipes = recipesService.SelectByPrimaryKey(Recipes_id);
+        String Recipes_img = upload(file,String.valueOf(Recipes_id));
         if (Recipes_img.equals("fail")){
             return "文件上传失败";
         }
 
-        if (haverecipes == null){
-            Recipes recipes = new Recipes();
-            recipes.setRecipesName(Recipes_name);
-            //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8080/Img/xxxx.jpg
-            recipes.setRecipesImg(Recipes_img);
-            recipes.setRecipesPrice(Double.valueOf(Recipes_price));
-            recipes.setRecipesMargin(Double.valueOf(Recipes_margin));
-            recipesService.insert(recipes);
-            return "成功";
-        }
-        haverecipes.setRecipesName(Recipes_name);
-        haverecipes.setRecipesImg(Recipes_img);
-        haverecipes.setRecipesPrice(Double.valueOf(Recipes_price));
-        haverecipes.setRecipesMargin(Double.valueOf(Recipes_margin));
-        int end = recipesService.UpdateByPrimaryKeySelective(haverecipes);
+//        if (haverecipes == null){
+//            Recipes recipes = new Recipes();
+//            recipes.setRecipesName(Recipes_name);
+//            //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8080/Img/xxxx.png
+//            recipes.setRecipesImg(Recipes_img);
+//            recipes.setRecipesPrice(Double.valueOf(Recipes_price));
+//            recipes.setRecipesMargin(Double.valueOf(Recipes_margin));
+//            recipesService.insert(recipes);
+//            return "成功";
+//        }
+        recipes.setRecipesName(Recipes_name);
+        //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8080/Img/xxxx.png
+        recipes.setRecipesImg("http://118.126.65.227:8080/Img/"+Recipes_img);
+        recipes.setRecipesPrice(Double.valueOf(Recipes_price));
+        recipes.setRecipesMargin(Double.valueOf(Recipes_margin));
+        int end = recipesService.UpdateByPrimaryKeySelective(recipes);
         if (end == 1){
             return "成功";
         }
@@ -328,10 +352,24 @@ public class CanteenControler {
     * */
 
     /*
+    *获得特价和推荐菜品
+    * */
+    @RequestMapping("GetWellRecipes")
+    public List<Recipes> GetWellRecipes(@RequestParam("type") String type){
+        List<Recipes> resultList = null;
+        if (type.equals("新品特价")){
+            resultList = recipesService.SelectRecipesByType("特价");
+        }else if (type.equals("食堂推荐")){
+            resultList = recipesService.SelectRecipesByType("推荐");
+        }
+        return resultList;
+    }
+
+    /*
     * 获得热销菜品
     * */
     @RequestMapping("GetSellWellRecipes")
-    public List<Recipes> GetSellWellRecipes(){
+    public List<HashMap> GetSellWellRecipes(){
         List<DietRecord> DRlist = dietRecordService.SelectMonthDiet();
         List<Map> list = new ArrayList<>();
         int i = 0;
@@ -369,7 +407,7 @@ public class CanteenControler {
         });
 
         int number = 1;
-        List<Recipes> resultList = new ArrayList<>();
+        List<HashMap> resultList = new ArrayList<>();
         //取前十热销
         for(Map.Entry<Integer,Integer> mapping:list1){
 //            System.out.println(mapping.getKey()+":"+mapping.getValue());
@@ -377,8 +415,14 @@ public class CanteenControler {
                 break;
             }
             int recipes_id = mapping.getKey();
+            if (recipes_id == 44 || recipes_id == 27 ||recipes_id == 30 ||recipes_id == 31 ||recipes_id == 43 ||
+                    recipes_id == 45 ||recipes_id == 39)
+                continue;
+            HashMap Wellmap = new HashMap();
             Recipes recipes = recipesService.SelectByPrimaryKey(recipes_id);
-            resultList.add(recipes);
+            Wellmap.put("菜品信息",recipes);
+            Wellmap.put("菜品销量",mapping.getValue());
+            resultList.add(Wellmap);
             number++;
         }
         return resultList;

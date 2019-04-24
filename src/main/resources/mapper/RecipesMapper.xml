@@ -58,6 +58,10 @@
     select Recipes_name from recipes where Recipes_type LIKE '%${recipesType}%'
   </select>
 
+  <select id="selectRecipesByType" resultMap="BaseResultMap" parameterType="String">
+    select * from recipes where Recipes_type LIKE '%${recipesType}%'
+  </select>
+
   <select id="getId" parameterType="String" resultType="java.lang.Integer">
     select Recipes_id from recipes where Recipes_name = #{recipesName,jdbcType=VARCHAR}
   </select>

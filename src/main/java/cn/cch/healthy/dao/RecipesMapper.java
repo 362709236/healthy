@@ -19,8 +19,8 @@ public interface RecipesMapper {
     int updateByPrimaryKeySelective(Recipes record);
 
     int updateByPrimaryKey(Recipes record);
-
-    List findall();
+	
+	List findall();
 
     String getName(Integer recipesId);
 
@@ -31,6 +31,8 @@ public interface RecipesMapper {
     Recipes selectByName(String recipesName);
 
     List selectByType(@Param("recipesType") String recipesType);
+
+    List selectRecipesByType(@Param("recipesType") String recipesType);
 
     List<Recipes> getRecipesByType(String typeTag);
 
