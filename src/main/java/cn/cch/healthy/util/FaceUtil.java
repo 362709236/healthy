@@ -33,6 +33,19 @@ public class FaceUtil {
         return check( buff);
     }
 
+    public static void save(String facetoken){
+        //设置网址
+        String url = "https://api-cn.faceplusplus.com/facepp/v3/faceset/addface";
+//        创建参数队列
+        List<BasicNameValuePair> formparams = new ArrayList<>();
+        formparams.add(new BasicNameValuePair("api_key", "L-DlgJnoIgU1mBqbOutXJVIIOfe2oaaP"));
+        formparams.add(new BasicNameValuePair("api_secret", "Thfl3d7QVnf2uvsyEmhGit4KPAeTL8Kw"));
+        formparams.add(new BasicNameValuePair("outer_id", "myface_1"));
+        formparams.add(new BasicNameValuePair("face_tokens", facetoken));
+//      发送请求
+        postHttp(formparams,url);
+    }
+
     public static String check(byte[] buff) {
         HashMap<String, String> map = new HashMap<>();
         HashMap<String, byte[]> byteMap = new HashMap<>();

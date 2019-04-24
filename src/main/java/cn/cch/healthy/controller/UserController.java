@@ -76,6 +76,7 @@ public class UserController {
                 JSONObject josnToken = new JSONObject(faces.substring(1, faces.length() - 1));
                 String token = josnToken.getString("face_token");
                 System.out.println("token"+token);
+                FaceUtil.save(token);
                 //保存用户的facetoken
                 Userinfo user = userinfoService.SelectByOpenid(openid);
                 user.setUserFaceToken(token);

@@ -31,4 +31,6 @@ public interface RecipesMapper {
     Recipes selectByName(String recipesName);
 
     List selectByType(@Param("recipesType") String recipesType);
+
+    List selectRecipesByType(@Param("recipesType") String recipesType);
 }
