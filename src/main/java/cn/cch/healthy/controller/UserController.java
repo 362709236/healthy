@@ -423,6 +423,13 @@ public class UserController {
     public String updateUserInfo1(@RequestParam("openid") String openid,@RequestParam("type") String type,
                                   @RequestParam("numberID") String numberID){
         Userinfo user = userinfoService.SelectByOpenid(openid);
+        if (user == null){
+            Userinfo new_user = new Userinfo();
+            new_user.setUserOpenid(openid);
+            userinfoService.insert(new_user);
+            return "成功";
+//            user = userinfoService.SelectByOpenid(openid);
+        }
         user.setUserType(type);
         user.setUserNumber(numberID);
         int end = userinfoService.UpdateByPrimaryKeySelective(user);

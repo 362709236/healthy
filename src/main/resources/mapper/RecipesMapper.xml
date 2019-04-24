@@ -38,7 +38,14 @@
   <select id="getName" resultType="java.lang.String" parameterType="java.lang.Integer">
     select Recipes_name from recipes where Recipes_id = #{recipesId,jdbcType=INTEGER}
   </select>
-
+  <select id="getRecipesByType" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select <include refid="Base_Column_List" />
+    from recipes where Recipes_type
+    LIKE #{typeTag,jdbcType=VARCHAR}
+  </select>
+  <select id="getTypeByid" resultType="java.lang.String" parameterType="java.lang.Integer">
+    select Recipes_type from recipes where Recipes_id = #{recipesId,jdbcType=INTEGER}
+  </select>
   <select id="findall" resultMap="BaseResultMap">
     select * from recipes
   </select>

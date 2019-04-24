@@ -324,7 +324,7 @@ public class CanteenControler {
 //        }
         recipes.setRecipesName(Recipes_name);
         //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8080/Img/xxxx.png
-        recipes.setRecipesImg(Recipes_img);
+        recipes.setRecipesImg("http://118.126.65.227:8080/Img/"+Recipes_img);
         recipes.setRecipesPrice(Double.valueOf(Recipes_price));
         recipes.setRecipesMargin(Double.valueOf(Recipes_margin));
         int end = recipesService.UpdateByPrimaryKeySelective(recipes);

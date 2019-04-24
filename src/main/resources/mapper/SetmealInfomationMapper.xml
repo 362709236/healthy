@@ -48,16 +48,16 @@
     delete from setmealinfomation
     where SM_id = #{smId,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="cn.cch.healthy.model.SetmealInfomation" >
+  <insert id="insert" useGeneratedKeys="true" keyProperty="smId" parameterType="cn.cch.healthy.model.SetmealInfomation" >
     <selectKey resultType="java.lang.Integer" keyProperty="smId" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into setmealinfomation (SM_name, SI_fat, SI_energy, 
+    insert into setmealinfomation (SM_id,SM_name, SI_fat, SI_energy,
       SI_portein, SI_vitamin_A, SI_vitamin_B_1, 
       SI_vitamin_B_2, SI_vitamin_C, SI_vitamin_E, 
       SI_Mg, SI_Ca, SI_Zn, SI_Fe, 
       SI_cholesterol, Right_time)
-    values (#{smName,jdbcType=VARCHAR}, #{siFat,jdbcType=DOUBLE}, #{siEnergy,jdbcType=DOUBLE}, 
+    values (#{smId,jdbcType=INTEGER},#{smName,jdbcType=VARCHAR}, #{siFat,jdbcType=DOUBLE}, #{siEnergy,jdbcType=DOUBLE},
       #{siPortein,jdbcType=DOUBLE}, #{siVitaminA,jdbcType=INTEGER}, #{siVitaminB1,jdbcType=INTEGER}, 
       #{siVitaminB2,jdbcType=INTEGER}, #{siVitaminC,jdbcType=INTEGER}, #{siVitaminE,jdbcType=INTEGER}, 
       #{siMg,jdbcType=INTEGER}, #{siCa,jdbcType=INTEGER}, #{siZn,jdbcType=INTEGER}, #{siFe,jdbcType=INTEGER}, 

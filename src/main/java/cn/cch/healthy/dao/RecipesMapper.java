@@ -33,4 +33,8 @@ public interface RecipesMapper {
     List selectByType(@Param("recipesType") String recipesType);
 
     List selectRecipesByType(@Param("recipesType") String recipesType);
+
+    List<Recipes> getRecipesByType(String typeTag);
+
+    String getTypeByid(Integer recipesId);
 }

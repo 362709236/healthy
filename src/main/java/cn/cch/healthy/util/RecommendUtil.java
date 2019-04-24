@@ -74,11 +74,12 @@ public class RecommendUtil {
     /*
     * 推荐算法
     * */
-    public void recommend_score(int userId) throws Exception {
+    public Map recommend_score(int userId) throws Exception {
         Userinfo consumer = recommendUtil.userinfoService.selectByPrimarykey(userId);
+        System.out.println(consumer.toString());
         //若用户没有填写性别和年龄   就无法推送
         if (consumer.getUserSex() == null || consumer.getUserAge() == null){
-            return;
+            return null;
         }
         //识别当前是早餐、午餐还是晚餐
         int hour = Calendar.HOUR;
@@ -104,6 +105,7 @@ public class RecommendUtil {
         //获得数据库中当前时间段所有套餐
         List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(time);
         List<Map> eatingRecord = dietRecordService.selectRecentRecord(userId,3,time);
+        System.out.println("食用记录"+eatingRecord.toString());
         double [] score = new double[setMealList.size()];
         for(int i=0;i<setMealList.size();i++)
         {
@@ -138,7 +140,25 @@ public class RecommendUtil {
         pushInfomation.setPiDate(new Date());
         pushInfomation.setPiTime(time);
         recommendUtil.pushInfomationService.addNewPush(pushInfomation);
+
+        Map map = new HashMap();
+        List<List> setmeals = new ArrayList();
+        for(int i=0;i<3;i++)
+        {
+            List<Integer> recipeList = setMealService.selectRecipeId(setMealList.get(i).getSmId());
+            List recipeName = new ArrayList();
+            for(int j=0;j<recipeList.size();j++)
+            {
+                recipeName.add(recipesService.getName(recipeList.get(j)));
+            }
+            setmeals.add(recipeName);
+        }
+        map.put("recipes",setmeals);
+        return map;
     }
+
+
+
     @Value("${PROTEINWEIGHT}")
     private double PROTEINWEIGHT;
     @Value("${ENERGYWEIGHT}")
@@ -164,35 +184,37 @@ public class RecommendUtil {
         double score_protein = 10-distance/3;
         if (score_protein<0)
             score_protein=0;
-
+        System.out.println("蛋白质打分完成！分数为"+score_protein);
         //能量打分
-        distance = Math.abs(setmeal.getSiEnergy()-energyFormula(consumer.getUserSex()
-                ,consumer.getUserWeight(),consumer.getUserHeight(),consumer.getUserAge()));
+        distance = Math.abs(setmeal.getSiEnergy()*0.8-energyFormula(consumer.getUserSex()
+                ,consumer.getUserWeight(),consumer.getUserHeight(),consumer.getUserAge())*rate);
         double score_energy = 10-distance/30;
         if(score_energy<0)
             score_energy=0;
-        System.out.println(("营养素打分完成！"));
+        System.out.println("能量打分完成！分数为"+score_energy);
         //近期是否吃过相同菜品打分
         double deScore=0;
         for(int i=0;i<recipeList.size();i++)
         {
             for (int j=0;j<eatingRecord.size();j++)
             {
-                if (recipeList.get(i)==eatingRecord.get(j).get("recipeId"))
-                    deScore+=Double.parseDouble(eatingRecord.get(j).get("deWeight").toString());
+                if (Integer.parseInt(recipeList.get(i).toString())
+                        ==Integer.parseInt(eatingRecord.get(j).get("recipeId").toString()))
+                    deScore += Double.parseDouble(eatingRecord.get(j).get("deWeight").toString());
             }
         }
-        double score_recent = 10-deScore;
-        if(score_recent<0)
-            score_recent=0;
-        System.out.println("近期吃过的菜品打分完成！");
+        double score_recent = deScore;
+        if(score_recent>10)
+            score_recent=10;
+        System.out.println("近期吃过的菜品打分完成！分数为"+score_recent);
         //食堂剩余量打分
         //是否符合用户爱好打分
         double matchDegree = interestService.match(setmeal.getSmId(),consumer.getUserId())*2;
         double score_match = matchDegree;
         if (score_match>10)
             score_match=10;
-        System.out.println("食堂剩余量打分完成！");
+        System.out.println("用户爱好打分完成！分数为"+score_match);
+
         //根据用户当前疾病打分
         List<Integer> illness = userIllnessService.SelectByUserid(consumer.getUserId());
             //用户当前禁止吃的食材列表
@@ -232,20 +254,21 @@ public class RecommendUtil {
         }
         if (score_illness>10)
             score_illness=10;
-        System.out.println("用户疾病打分完成！");
+        System.out.println("用户疾病打分完成！分数为"+score_illness);
+
         //计算最终得分
         double finalScore=score_protein*PROTEINWEIGHT+score_energy*ENERGYWEIGHT
                 +score_recent*RECENTWEIGHT+score_match*INTERESTWEIGHT+
                 0*ILLNESSWEIGHT;
-        System.out.println("---------------打分成功-----------------");
+        System.out.println("---------------打分成功---------"+finalScore+"--------");
         return finalScore;
     }
 
     private double energyFormula(String sex,double weight,double height,int age)
     {
-        if (sex.equals('男'))
+        if (sex.equals("男"))
             return 66+13.7*weight+5*height+6.8*age;
-        else if(sex.equals('女'))
+        else if(sex.equals("女"))
             return 655+9.6*weight+1.8*height+4.7*age;
         else
             return -1;
