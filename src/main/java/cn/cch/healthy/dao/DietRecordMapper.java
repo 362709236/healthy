@@ -25,4 +25,12 @@ public interface DietRecordMapper {
     List selectByDate(@Param("dateStr") String dateStr,@Param("userId") int userId);
 
     List selectAll();
+
+    List selectByUserid(int userId);
+
+    List selectUserWeekDiet(int userId);
+
+    List selectMonthDiet();
+
+    List GetUserWeekly(@Param("date1") String date1,@Param("date2") String date2,@Param("userId") int userId);
 }

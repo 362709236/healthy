@@ -1,6 +1,7 @@
 package cn.cch.healthy.dao;
 
 import cn.cch.healthy.model.Recipes;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,6 +25,12 @@ public interface RecipesMapper {
     String getName(Integer recipesId);
 
     int getId(String recipesName);
+
+    List vagueSelectRecipes(String recipesName);
+
+    Recipes selectByName(String recipesName);
+
+    List selectByType(@Param("recipesType") String recipesType);
 
     List<Recipes> getRecipesByType(String typeTag);
 

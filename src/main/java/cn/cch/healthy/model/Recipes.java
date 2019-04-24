@@ -7,6 +7,10 @@ public class Recipes {
 
     private String recipesType;
 
+    private Double recipesPrice;
+
+    private String recipesImg;
+
     private Double recipesFat;
 
     private Double recipesProtein;
@@ -57,6 +61,22 @@ public class Recipes {
 
     public void setRecipesType(String recipesType) {
         this.recipesType = recipesType == null ? null : recipesType.trim();
+    }
+
+    public Double getRecipesPrice() {
+        return recipesPrice;
+    }
+
+    public void setRecipesPrice(Double recipesPrice) {
+        this.recipesPrice = recipesPrice;
+    }
+
+    public String getRecipesImg() {
+        return recipesImg;
+    }
+
+    public void setRecipesImg(String recipesImg) {
+        this.recipesImg = recipesImg == null ? null : recipesImg.trim();
     }
 
     public Double getRecipesFat() {

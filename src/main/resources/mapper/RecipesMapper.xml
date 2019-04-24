@@ -5,6 +5,8 @@
     <id column="Recipes_id" property="recipesId" jdbcType="INTEGER" />
     <result column="Recipes_name" property="recipesName" jdbcType="VARCHAR" />
     <result column="Recipes_type" property="recipesType" jdbcType="VARCHAR" />
+    <result column="Recipes_price" property="recipesPrice" jdbcType="DOUBLE" />
+    <result column="Recipes_img" property="recipesImg" jdbcType="VARCHAR" />
     <result column="Recipes_fat" property="recipesFat" jdbcType="DOUBLE" />
     <result column="Recipes_protein" property="recipesProtein" jdbcType="DOUBLE" />
     <result column="Recipes_energy" property="recipesEnergy" jdbcType="DOUBLE" />
@@ -21,9 +23,10 @@
     <result column="Recipes_margin" property="recipesMargin" jdbcType="DOUBLE" />
   </resultMap>
   <sql id="Base_Column_List" >
-    Recipes_id, Recipes_name, Recipes_type, Recipes_fat, Recipes_protein, Recipes_energy, 
-    Recipes_vitamin_A, Recipes_vitamin_B_1, Recipes_vitamin_B_2, Recipes_vitamin_C, Recipes_vitamin_E, 
-    Recipes_Ca, Recipes_Mg, Recipes_Fe, Recipes_Zn, Recipes_cholesterol, Recipes_margin
+    Recipes_id, Recipes_name, Recipes_type, Recipes_price, Recipes_img, Recipes_fat, 
+    Recipes_protein, Recipes_energy, Recipes_vitamin_A, Recipes_vitamin_B_1, Recipes_vitamin_B_2, 
+    Recipes_vitamin_C, Recipes_vitamin_E, Recipes_Ca, Recipes_Mg, Recipes_Fe, Recipes_Zn, 
+    Recipes_cholesterol, Recipes_margin
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -47,8 +50,20 @@
     select * from recipes
   </select>
 
+  <select id="selectByName" resultMap="BaseResultMap">
+    select * from recipes where Recipes_name = #{recipesName,jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectByType" resultMap="BaseResultMap">
+    select Recipes_name from recipes where Recipes_type LIKE '%${recipesType}%'
+  </select>
+
   <select id="getId" parameterType="String" resultType="java.lang.Integer">
     select Recipes_id from recipes where Recipes_name = #{recipesName,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="vagueSelectRecipes" resultMap="BaseResultMap">
+    select * from recipes where Recipes_name LIKE concat('%'，#{recipesName,jdbcType=VARCHAR}，'%');
   </select>
   
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
@@ -59,18 +74,20 @@
     <selectKey resultType="java.lang.Integer" keyProperty="recipesId" order="AFTER" >
       SELECT LAST_INSERT_ID()
     </selectKey>
-    insert into recipes (Recipes_name, Recipes_type, Recipes_fat, 
-      Recipes_protein, Recipes_energy, Recipes_vitamin_A, 
-      Recipes_vitamin_B_1, Recipes_vitamin_B_2, Recipes_vitamin_C, 
-      Recipes_vitamin_E, Recipes_Ca, Recipes_Mg, 
-      Recipes_Fe, Recipes_Zn, Recipes_cholesterol, 
-      Recipes_margin)
-    values (#{recipesName,jdbcType=VARCHAR}, #{recipesType,jdbcType=VARCHAR}, #{recipesFat,jdbcType=DOUBLE}, 
-      #{recipesProtein,jdbcType=DOUBLE}, #{recipesEnergy,jdbcType=DOUBLE}, #{recipesVitaminA,jdbcType=DOUBLE}, 
-      #{recipesVitaminB1,jdbcType=DOUBLE}, #{recipesVitaminB2,jdbcType=DOUBLE}, #{recipesVitaminC,jdbcType=DOUBLE}, 
-      #{recipesVitaminE,jdbcType=DOUBLE}, #{recipesCa,jdbcType=DOUBLE}, #{recipesMg,jdbcType=DOUBLE}, 
-      #{recipesFe,jdbcType=DOUBLE}, #{recipesZn,jdbcType=DOUBLE}, #{recipesCholesterol,jdbcType=DOUBLE}, 
-      #{recipesMargin,jdbcType=DOUBLE})
+    insert into recipes (Recipes_name, Recipes_type, Recipes_price, 
+      Recipes_img, Recipes_fat, Recipes_protein, 
+      Recipes_energy, Recipes_vitamin_A, Recipes_vitamin_B_1, 
+      Recipes_vitamin_B_2, Recipes_vitamin_C, Recipes_vitamin_E, 
+      Recipes_Ca, Recipes_Mg, Recipes_Fe, 
+      Recipes_Zn, Recipes_cholesterol, Recipes_margin
+      )
+    values (#{recipesName,jdbcType=VARCHAR}, #{recipesType,jdbcType=VARCHAR}, #{recipesPrice,jdbcType=DOUBLE}, 
+      #{recipesImg,jdbcType=VARCHAR}, #{recipesFat,jdbcType=DOUBLE}, #{recipesProtein,jdbcType=DOUBLE}, 
+      #{recipesEnergy,jdbcType=DOUBLE}, #{recipesVitaminA,jdbcType=DOUBLE}, #{recipesVitaminB1,jdbcType=DOUBLE}, 
+      #{recipesVitaminB2,jdbcType=DOUBLE}, #{recipesVitaminC,jdbcType=DOUBLE}, #{recipesVitaminE,jdbcType=DOUBLE}, 
+      #{recipesCa,jdbcType=DOUBLE}, #{recipesMg,jdbcType=DOUBLE}, #{recipesFe,jdbcType=DOUBLE}, 
+      #{recipesZn,jdbcType=DOUBLE}, #{recipesCholesterol,jdbcType=DOUBLE}, #{recipesMargin,jdbcType=DOUBLE}
+      )
   </insert>
   <insert id="insertSelective" parameterType="cn.cch.healthy.model.Recipes" >
     <selectKey resultType="java.lang.Integer" keyProperty="recipesId" order="AFTER" >
@@ -83,6 +100,12 @@
       </if>
       <if test="recipesType != null" >
         Recipes_type,
+      </if>
+      <if test="recipesPrice != null" >
+        Recipes_price,
+      </if>
+      <if test="recipesImg != null" >
+        Recipes_img,
       </if>
       <if test="recipesFat != null" >
         Recipes_fat,
@@ -133,6 +156,12 @@
       </if>
       <if test="recipesType != null" >
         #{recipesType,jdbcType=VARCHAR},
+      </if>
+      <if test="recipesPrice != null" >
+        #{recipesPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="recipesImg != null" >
+        #{recipesImg,jdbcType=VARCHAR},
       </if>
       <if test="recipesFat != null" >
         #{recipesFat,jdbcType=DOUBLE},
@@ -187,6 +216,12 @@
       <if test="recipesType != null" >
         Recipes_type = #{recipesType,jdbcType=VARCHAR},
       </if>
+      <if test="recipesPrice != null" >
+        Recipes_price = #{recipesPrice,jdbcType=DOUBLE},
+      </if>
+      <if test="recipesImg != null" >
+        Recipes_img = #{recipesImg,jdbcType=VARCHAR},
+      </if>
       <if test="recipesFat != null" >
         Recipes_fat = #{recipesFat,jdbcType=DOUBLE},
       </if>
@@ -236,6 +271,8 @@
     update recipes
     set Recipes_name = #{recipesName,jdbcType=VARCHAR},
       Recipes_type = #{recipesType,jdbcType=VARCHAR},
+      Recipes_price = #{recipesPrice,jdbcType=DOUBLE},
+      Recipes_img = #{recipesImg,jdbcType=VARCHAR},
       Recipes_fat = #{recipesFat,jdbcType=DOUBLE},
       Recipes_protein = #{recipesProtein,jdbcType=DOUBLE},
       Recipes_energy = #{recipesEnergy,jdbcType=DOUBLE},

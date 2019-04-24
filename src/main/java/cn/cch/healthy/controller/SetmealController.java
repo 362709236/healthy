@@ -34,8 +34,6 @@ public class SetmealController {
     @Autowired
     InterestService interestService;
 
-    @Autowired
-    SetmealInterestService setmealInterestService;
 
     //套餐自动生成
     @RequestMapping("autoForm")
@@ -51,8 +49,18 @@ public class SetmealController {
         {
             System.out.println(vegeDishList.get(i).getRecipesName());
         }*/
-        int id=insertSM("中餐1");
-        System.out.println("新增的套餐id为"+id);
+       // int id=insertSM("中餐1");
+       // System.out.println("新增的套餐id为"+id);
+        for (int i=0;i<meatDishList.size();i++)
+        {
+            for (int j=0;j<1;j++)
+            {
+                int sm_id = insertSM("中餐"+(i+j+1));
+                int recipesArray[] = {meatDishList.get(i).getRecipesId(),vegeDishList.get(j).getRecipesId()};
+                updateSM(recipesArray,sm_id,2);
+                System.out.println("成功添加中餐"+(i+j+1));
+            }
+        }
         return "成功！";
     }
 
@@ -78,12 +86,6 @@ public class SetmealController {
         setmealInfomationService.insert(SmI);
         int id = SmI.getSmId();
         return id;
-    }
-
-    @RequestMapping("shiyan")
-    public int shiyan1(@RequestParam("Righttime") int Righttime){
-        System.out.println(Righttime);
-        return 0;
     }
 
     //搭配套餐
@@ -150,7 +152,13 @@ public class SetmealController {
 
                 //添加标签
                 String tags[]=recipesService.getTypeByid(insertRecipesId).split(",");
-               // for(int j=0)
+                System.out.println("所有标签"+recipesService.getTypeByid(insertRecipesId));
+                for(int j=0;j<tags.length;j++)
+                {
+                    int id = interestService.GetID(tags[j]);
+                    Setmeal_Interest setmeal_interest = new Setmeal_Interest(SM_id,id);
+                    interestService.insertSetmealIntest(setmeal_interest);
+                }
             }
         }
         if (deleteList.size() != 0){

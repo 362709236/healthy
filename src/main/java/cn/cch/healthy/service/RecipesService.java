@@ -27,6 +27,12 @@ public class RecipesService {
 
     public int GetId(String recipesName){ return mapper.getId(recipesName); }
 
+    public List VagueSelectRecipes(String recipesName){ return mapper.vagueSelectRecipes(recipesName); }
+
+    public Recipes SelectByName(String recipesName){ return mapper.selectByName(recipesName); }
+
+    public List<String> SelectByType(String recipesType){ return mapper.selectByType(recipesType); }
+
     public List<Recipes> getRecipesByType(String typeTag){return mapper.getRecipesByType("%"+typeTag+"%");}
 
     public String getTypeByid(int id){return mapper.getTypeByid(id);}

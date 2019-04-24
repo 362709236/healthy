@@ -7,6 +7,11 @@ public class Setmeal_Interest {
 
     private Integer interestId;
 
+    public Setmeal_Interest(Integer smId, Integer interestId) {
+        this.smId = smId;
+        this.interestId = interestId;
+    }
+
     public Integer getId() {
         return id;
     }

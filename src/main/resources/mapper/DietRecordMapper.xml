@@ -26,6 +26,32 @@
     select * from dietrecord
   </select>
 
+  <select id="selectByUserid" resultMap="BaseResultMap">
+    select * from dietrecord where User_id = #{userId,jdbcType=INTEGER};
+  </select>
+
+  <select id="selectUserWeekDiet" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+    select
+    <include refid="Base_Column_List" />
+    from dietrecord
+    where date_sub(curdate(), INTERVAL 7 DAY) &lt;= date(`DR_date`)
+    and User_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <select id="GetUserWeekly" resultMap="BaseResultMap">
+    select *
+    from dietrecord
+    where DR_date &gt; #{date1,jdbcType=VARCHAR} and DR_date &lt; #{date2,jdbcType=VARCHAR}
+    and User_id = #{userId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectMonthDiet" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from dietrecord
+    where date_sub(curdate(), INTERVAL 30 DAY) &lt;= date(`DR_date`)
+  </select>
+
   <select id="selectRecentDiet" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select
     <include refid="Base_Column_List" />

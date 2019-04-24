@@ -21,5 +21,5 @@ public interface InterestMapper {
 
     List selectAll();
 
-    int selectIdByName(String name);
+    int getID(String interestName);
 }
