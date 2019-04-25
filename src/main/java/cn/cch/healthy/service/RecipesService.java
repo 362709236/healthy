@@ -31,7 +31,7 @@ public class RecipesService {
 
     public Recipes SelectByName(String recipesName){ return mapper.selectByName(recipesName); }
 
-    public List<String> SelectByType(String recipesType){ return mapper.selectByType(recipesType); }
+    public List SelectByType(String recipesType){ return mapper.selectByType(recipesType); }
 
     public List SelectRecipesByType(String type){ return mapper.selectRecipesByType(type); }
 
