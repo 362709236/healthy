@@ -163,10 +163,10 @@ public class UserController {
                 boolean isExit=FaceUtil.compare(userList.get(j).getUserFaceToken(),faceList.get(i));
                 if(isExit){
                     //推送内容
-                    //map=recommendUtil.recommend_score(userList.get(j).getUserId());
-                    //JSONObject JSONmap = new JSONObject(map);
-                   // HttpTest.appadd(JSONmap);
-                    //String transJson = JSONmap.toString();
+                    map=recommendUtil.recommend_score(userList.get(j).getUserId());
+                    JSONObject JSONmap = new JSONObject(map);
+                    HttpTest.appadd(JSONmap);
+//                    String transJson = JSONmap.toString();
 //                    String result = OkHttpUtil.postJsonParams("http://47.101.179.98/wechat/returnpost2",transJson);
 //                    String result = OkHttpUtil.postJsonParams("http://localhost:8081/demo2/demo",transJson);
 //                    String str = OkHttpUtil.doPostHttpRequest("http://localhost:8081/demo2/demo", map.toString());
@@ -557,6 +557,7 @@ public class UserController {
             for (int i = 0;i<deleteList.size();i++){
                 int interest_id = deleteList.get(i);
                 UserInterest UI = new UserInterest();
+                UI.setUiId(interest_id);
                 UI.setInterestId(interest_id);
                 UI.setUserId(user_id);
                 interestService.DeleteByUserInterest(UI);
@@ -693,6 +694,7 @@ public class UserController {
     //判断用户是否存在数据库
     @RequestMapping("JudgeUser")
     public String JudgeUser(@RequestParam("openid") String openid){
+//        System.out.println(openid);
         Userinfo user = userinfoService.SelectByOpenid(openid);
         if (user == null){
             return "不存在该用户";
