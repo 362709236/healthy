@@ -1,6 +1,7 @@
 package cn.cch.healthy.dao;
 
 import cn.cch.healthy.model.Userinfo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

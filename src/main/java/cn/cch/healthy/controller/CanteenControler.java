@@ -84,12 +84,12 @@ public class CanteenControler {
             List resultlist = new ArrayList();
             for (int i = 0;i<FFlist.size();i++){
                 Map map = new HashMap();
-                int recipes_id = FFlist.get(i).getRecipesId();
-                String recipes_name = recipesService.getName(recipes_id);
+                int food_id = FFlist.get(i).getFoodId();
+                Food food = foodService.selectByPrimaryKey(food_id);
 
                 map.put("formulaId",FFlist.get(i).getFfId());
-                map.put("recipes_name",recipes_name);
-                map.put("recipes_number",FFlist.get(i).getFoodNumber());
+                map.put("food_name",food.getFoodName());
+                map.put("food_number",FFlist.get(i).getFoodNumber());
                 resultlist.add(map);
             }
             return resultlist;

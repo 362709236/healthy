@@ -54,7 +54,7 @@
     select * from recipes where Recipes_name = #{recipesName,jdbcType=VARCHAR}
   </select>
 
-  <select id="selectByType" resultMap="BaseResultMap">
+  <select id="selectByType" resultType="java.lang.String">
     select Recipes_name from recipes where Recipes_type LIKE '%${recipesType}%'
   </select>
 

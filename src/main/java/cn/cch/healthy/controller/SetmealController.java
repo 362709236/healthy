@@ -34,7 +34,7 @@ public class SetmealController {
     @Autowired
     InterestService interestService;
 
-    private int start=1;
+    private int start=341;
 
 
     //套餐自动生成（一荤一素）-------中餐
@@ -172,7 +172,7 @@ public class SetmealController {
 
                 //添加标签
                 String tags[]=recipesService.getTypeByid(insertRecipesId).split(",");
-                System.out.println("所有标签"+recipesService.getTypeByid(insertRecipesId));
+               // System.out.println("所有标签"+recipesService.getTypeByid(insertRecipesId));
                 for(int j=0;j<tags.length;j++)
                 {
                     int id = interestService.GetID(tags[j]);
