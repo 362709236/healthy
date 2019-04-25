@@ -166,7 +166,7 @@ public class UserController {
                     map=recommendUtil.recommend_score(userList.get(j).getUserId());
                     JSONObject JSONmap = new JSONObject(map);
                     HttpTest.appadd(JSONmap);
-//                    String transJson = JSONmap.toString();
+                   // String transJson = JSONmap.toString();
 //                    String result = OkHttpUtil.postJsonParams("http://47.101.179.98/wechat/returnpost2",transJson);
 //                    String result = OkHttpUtil.postJsonParams("http://localhost:8081/demo2/demo",transJson);
 //                    String str = OkHttpUtil.doPostHttpRequest("http://localhost:8081/demo2/demo", map.toString());
@@ -423,13 +423,13 @@ public class UserController {
     public String updateUserInfo1(@RequestParam("openid") String openid,@RequestParam("type") String type,
                                   @RequestParam("numberID") String numberID){
         Userinfo user = userinfoService.SelectByOpenid(openid);
-        if (user == null){
+        if (user == null)
+        {
             Userinfo new_user = new Userinfo();
             new_user.setUserOpenid(openid);
             userinfoService.insert(new_user);
             return "成功";
-//            user = userinfoService.SelectByOpenid(openid);
-        }
+       }
         user.setUserType(type);
         user.setUserNumber(numberID);
         int end = userinfoService.UpdateByPrimaryKeySelective(user);
@@ -557,7 +557,6 @@ public class UserController {
             for (int i = 0;i<deleteList.size();i++){
                 int interest_id = deleteList.get(i);
                 UserInterest UI = new UserInterest();
-                UI.setUiId(interest_id);
                 UI.setInterestId(interest_id);
                 UI.setUserId(user_id);
                 interestService.DeleteByUserInterest(UI);
@@ -694,7 +693,6 @@ public class UserController {
     //判断用户是否存在数据库
     @RequestMapping("JudgeUser")
     public String JudgeUser(@RequestParam("openid") String openid){
-//        System.out.println(openid);
         Userinfo user = userinfoService.SelectByOpenid(openid);
         if (user == null){
             return "不存在该用户";

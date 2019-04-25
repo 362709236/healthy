@@ -43,6 +43,7 @@
     <include refid="Base_Column_List" />
     from setmealinfomation
     where Right_time = #{rightTime,jdbcType=INTEGER}
+    ORDER BY RAND() LIMIT #{num,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from setmealinfomation
