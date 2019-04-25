@@ -52,7 +52,7 @@ public class RecommendController {
     @ResponseBody
     @RequestMapping("/test2")
     public List<Map> test2() throws Exception {
-        List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(2);
+        List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(2,30);
         List<Adward> adwards = new ArrayList<Adward>();
         List list=new ArrayList();
         //设置奖品的名称(套餐id)和权重

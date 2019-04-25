@@ -19,7 +19,7 @@ public interface SetmealInfomationMapper {
 
     int updateByPrimaryKey(SetmealInfomation record);
 
-    List selectByTime(int time);
+    List selectByTime(int rightTime,int num);
 
     String findSMnameByPrimaryKey(int smId);
 

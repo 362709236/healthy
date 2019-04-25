@@ -103,7 +103,7 @@ public class RecommendUtil {
         //根据中国膳食推荐摄入表获得当前用户推荐摄入量
         StandardIntake intake = recommendUtil.standardIntakeService.getStandardIntake(consumer);
         //获得数据库中当前时间段所有套餐
-        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(time);
+        List<SetmealInfomation> setMealList = recommendUtil.setmealInfomationService.SelectByTime(time,30);
         List<Map> eatingRecord = dietRecordService.selectRecentRecord(userId,3,time);
         System.out.println("食用记录"+eatingRecord.toString());
         double [] score = new double[setMealList.size()];
