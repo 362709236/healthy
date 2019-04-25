@@ -90,67 +90,12 @@ public class UserController {
         return "成功";
     }
 
-    /*
-     * 删除文件
-     */
-
-    public static boolean deleteFile(String fileName) {
-        File file = new File(fileName);
-        // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
-        if (file.exists() && file.isFile()) {
-            if (file.delete()) {
-                System.out.println("删除单个文件" + fileName + "成功！");
-                return true;
-            } else {
-                System.out.println("删除单个文件" + fileName + "失败！");
-                return false;
-            }
-        } else {
-            System.out.println("删除单个文件失败：" + fileName + "不存在！");
-            return false;
-        }
-    }
-
-    /*
-     * 单文件上传
-     */
-
-    public String upload(MultipartFile file,String fn) throws IOException {
-        if (!file.isEmpty()) {
-            String fileName=file.getOriginalFilename();
-            // 获取文件的后缀名
-            String suffixName = fileName.substring(fileName.lastIndexOf("."));
-            // 文件上传后的路径
-            String filePath = "C:/Users/Administrator/Desktop/renlianshibie/";
-            // 解决中文问题，liunx下中文路径，图片显示问题
-            String realfile = filePath + fn + suffixName;
-            File dest = new File(realfile);
-
-            // 检测是否存在目录
-            if (!dest.getParentFile().exists()) {
-                dest.getParentFile().mkdirs();
-            }else if(dest.exists()){
-                deleteFile(realfile);
-            }
-            try {
-                file.transferTo(dest);
-                return filePath + fn + suffixName;
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return "fail";
-    }
-
     //比对用户
     @RequestMapping("/compare")
-    public String CompareFace(MultipartFile file) throws Exception {
-        UserController con = new UserController();
-        String path = con.upload(file,"picture");
+    public String CompareFace(String file) throws Exception {
+        List<String> faceList=testservice.test2(file);
+
         Map map = new HashMap();
-        List<String> faceList=testservice.test2(path);
         List<Userinfo> userList=userinfoService.SelectAll();  //获取所有用户
         if (faceList.size()==0||userList.size()==0)
             return "没有检测到人脸或者无用户face_token";

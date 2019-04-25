@@ -7,16 +7,14 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Service
 public class CompareImage {
 
-    public List<String> test2 (String path) throws JSONException {
-
-        File file = new File(path);    //假装是拍摄的图片
-        byte[] buff = FaceUtil.getBytesFromFile(file);
-        String str = FaceUtil.check(buff);
+    public List<String> test2 (String file) throws IOException {
+        String str = FaceUtil.checkFace(file);
         //facetoken 集合
         List<String> faceList = new ArrayList<String>();
         try{
