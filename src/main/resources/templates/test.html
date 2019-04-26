@@ -3,22 +3,63 @@
   <head>
     <title>GET VIDEO</title>
     <meta charset="utf-8">
-    <script type="text/javascript" src="js/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   </head>
   <style type="text/css" media="screen">
+    body{
+      background-image: url('http://img.lanrentuku.com/img/allimg/1312/138846727187.jpg');
+
+    }
     #canvas{
       margin-top: 300px;
+
+    }
+    .tookphoto{
+      display: flex;
+      justify-content: center;
+      height:700px;
+      /*align-items: center;*/
+      background-color: rgba(0,0,0,0.5);
+
+    }
+    .photo{
+      width:"500px";
+      height:"500px";
+      border-radius: 50%;
+      overflow: hidden;
+
     }
   </style>
   <body>
-  <input type="button" title="开启摄像头" value="开启摄像头" onclick="getMedia()" />
-  <video id="video" width="1000px" height="500px" autoplay="autoplay"></video>
-  <canvas id="canvas" width="500px" height="500px"></canvas>
+    <div class="tookphoto">
+        <div class="photo" style="height: 500px;">
+          <video id="video" autoplay="autoplay" style=""></video>
+        </div>
+        
+        <canvas id="canvas" width="500px" height="500px" style="border-radius:'50%'; display: none;"></canvas>
+    </div>
+
   <script>
-    var is=0;
-        function getMedia() {
+     /**
+         * 将以base64的图片url数据转换为Blob
+         * @param urlData
+         *            用url方式表示的base64图片数据
+         */
+        function convertBase64UrlToBlob(urlData){
+            var arr = urlData.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+            while(n--){
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], {type:mime});
+        }
+
+
+
+            var is=0;
+        
             let constraints = {
-                video: {width: 1000, height: 500},
+                video: {width: 500, height: 500},
                 audio: true
             };
             //获得video摄像头区域
@@ -34,24 +75,52 @@
                 video.play();
             });
             is=1;
-        }
+      
  
       function takePhoto() {
       //获得Canvas对象
+      var form = new FormData(); // FormData 对象
+      var url = "http://118.126.65.227:8080/user/compare"; // 接收上传文件的后台地址
+      var url2="http://localhost:8080/user/compare";
       if(is==1){
         let video = document.getElementById("video");
         let canvas = document.getElementById("canvas");
         let ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, 500, 500);
+        var bl = convertBase64UrlToBlob(canvas.toDataURL("image/png"));
+        form.append("file", bl, "file_"+Date.parse(new Date())+".jpg"); // 文件对象
         var info = {
                     name: $("#name").val(),
                     file: canvas.toDataURL("image/png")
                    }
-         $.post("http://localhost:8080/face/compare",info,function(data){
+        // $.post(url,info,function(data){
+        //   alert(data)                        
+        //   },"json") 
+        $.ajax({
+          type: 'POST',
+          url: url2,
+          data: info,
+          success: function(data){
+            alert(data)
+          },
+          error:function(data){
+            alert(data)
+          }
+        });
+         // $.ajax({
+         //        url: url,  /*这是处理文件上传的servlet*/
+         //        type: 'POST',
+         //        data: info,
+         //        dataType: "json",
 
-                            
+         //        success: function (returndata) {
+         //            alert(returndata)
 
-                    },"json") 
+         //        },
+         //        error: function (returndata) {
+         //            alert(returndata);
+         //        }
+         //    });
 
         }
       }

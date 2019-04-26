@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
@@ -512,10 +513,12 @@ public class CanteenControler {
      * */
     @RequestMapping("MakeSale")
     public String MakeSale(@RequestParam("RecipesArray") int[] RecipesArray,
-                           @RequestParam("User_id") int User_id){
+                           @RequestParam("User_id") int User_id) throws ParseException {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
         String datestr = sdf.format(date);
+        System.out.println(datestr);
         int time = 0;
         if(date.getHours()>=0&&date.getHours()<10)
         {
@@ -529,7 +532,6 @@ public class CanteenControler {
         {
             time = 3;
         }
-
         DietRecord DR = new DietRecord();
         DR.setDrDate(date);
         DR.setDrTime(time);
@@ -672,4 +674,18 @@ public class CanteenControler {
         System.out.println(food_id);
     }
 
+    @Test
+    public void test(){
+        String str = "";
+        String[] arr = str.split(",");
+//        for (String string : arr) {
+//            System.out.println("str"+string);
+//        }
+        if (arr[0].equals("")){
+            System.out.println("arr is null");
+        }
+        System.out.println("arr:"+arr[0]);
+        System.out.println(arr.length);
+
+    }
 }

@@ -60,11 +60,23 @@ public class UserController {
     @Autowired
     StandardIntakeService standardIntakeService;
 
+    @Autowired
+    UserConnentService userConnentService;
+
     @RequestMapping("uploadPic")
-    public String SetUserFace(@RequestParam("openid") String openid,MultipartFile file) throws IOException {
+    public String SetUserFace(MultipartFile file,@RequestParam("openid") String openid) throws IOException {
         if (file == null || "".equals(file.getOriginalFilename())) {
             return "上传的照片为空";
         } else {
+            if (file.getSize() > 5*1024*1024){
+                return "您上传的文件过大，请重试";
+            }
+            String[] strArray = file.getOriginalFilename().split("\\.");
+            String Filetype = strArray[1];
+            //bmp,jpg,png
+            if (!(Filetype.equals("bmp") || Filetype.equals("jpg") || Filetype.equals("png"))){
+                return "您上传的文件格式不对，请转换为bmp,jpg,png";
+            }
             String str = FaceUtil.check(file.getBytes());
             try {
                 JSONObject json = new JSONObject(str);
@@ -97,6 +109,10 @@ public class UserController {
 
         Map map = new HashMap();
         List<Userinfo> userList=userinfoService.SelectAll();  //获取所有用户
+        long nd = 1000 * 24 * 60 * 60;
+        long nh = 1000 * 60 * 60;
+        long nm = 1000 * 60;
+
         if (faceList.size()==0||userList.size()==0)
             return "没有检测到人脸或者无用户face_token";
         for(int i=0;i<faceList.size();i++){
@@ -108,9 +124,30 @@ public class UserController {
                 boolean isExit=FaceUtil.compare(userList.get(j).getUserFaceToken(),faceList.get(i));
                 if(isExit){
                     //推送内容
-                    map=recommendUtil.recommend_score(userList.get(j).getUserId());
-                    JSONObject JSONmap = new JSONObject(map);
-                    HttpTest.appadd(JSONmap);
+                    Userinfo user = userList.get(j);
+                    Date Recognize_time1 = user.getUserRecognize();
+                    Date Recognize_time2 = new Date();
+                    if (Recognize_time1 != null){
+                        // 获得两个时间的毫秒时间差异
+                        long diff = Math.abs(Recognize_time1.getTime() - Recognize_time2.getTime());
+                        // 计算差多少天
+                        long day = diff / nd;
+                        // 计算差多少小时
+                        long hour = diff % nd / nh;
+                        if (day == 0){
+                            if (hour < 1){
+                                System.out.println("还不到一个小时,无法进行推送");
+                                return "还不到一个小时,无法进行推送";
+                            }
+                        }
+                    }
+                    //更新记录时间
+                    user.setUserRecognize(new Date());
+                    userinfoService.UpdateByPrimaryKeySelective(user);
+                    //触发推送
+//                    map=recommendUtil.recommend_score(userList.get(j).getUserId());
+//                    JSONObject JSONmap = new JSONObject(map);
+//                    HttpTest.appadd(JSONmap);
                    // String transJson = JSONmap.toString();
 //                    String result = OkHttpUtil.postJsonParams("http://47.101.179.98/wechat/returnpost2",transJson);
 //                    String result = OkHttpUtil.postJsonParams("http://localhost:8081/demo2/demo",transJson);
@@ -196,83 +233,14 @@ public class UserController {
         user.setUserCcupation(occupation);
 
         int user_id = user.getUserId();
-        List<UserIllness> old_UIlist = userIllnessService.SelectByUserid(user_id);
 
-        ArrayList<Integer> insertList = new ArrayList();
-        ArrayList<Integer> deleteList = new ArrayList();
-        ArrayList<Integer> restList = new ArrayList();
-        HashMap<String, Object> map=new HashMap<String, Object>();
-
-        String[] IllnessArray = Illness_Str.split(",");
-        if (!IllnessArray[0].equals("暂无")){
-            for (int i = 0;i<IllnessArray.length;i++){
-                Illness ill = illnessService.SelectByIllname(IllnessArray[i]);
-                int ill_id = ill.getIllId();
-                insertList.add(ill_id);
-            }
-        }else{
-            userIllnessService.DeleteByUserid(user_id);
-        }
-
-        if (old_UIlist.size() != 0 && IllnessArray.length != 0){
-            for (int i = 0;i<old_UIlist.size();i++){
-                int old_UIid = old_UIlist.get(i).getIllId();
-                deleteList.add(old_UIid);
-                for (int j = 0;j<insertList.size();j++){
-                    if (insertList.get(j) == old_UIid){
-                        restList.add(old_UIid);
-                        deleteList.remove(Integer.valueOf(old_UIid));
-                    }
-                }
-            }
-
-            if (restList.size() != 0){
-                for (int m = 0;m<insertList.size();m++){
-                    int in = insertList.get(m);
-                    for (int n = 0;n<restList.size();n++){
-                        int out = restList.get(n);
-                        if (out==in){
-                            insertList.remove(Integer.valueOf(in));
-                            m--;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (insertList.size() != 0){
-            for (int i = 0;i<insertList.size();i++){
-                int ill_id = insertList.get(i);
-                UserIllness UI = new UserIllness();
-                UI.setIllId(ill_id);
-                UI.setUserId(user_id);
-                userIllnessService.insert(UI);
-            }
-        }
-        if (deleteList.size() != 0){
-            for (int i = 0;i<deleteList.size();i++){
-                int ill_id = deleteList.get(i);
-                UserIllness UI = new UserIllness();
-                UI.setIllId(ill_id);
-                UI.setUserId(user_id);
-                userIllnessService.DeleteByUserIll(UI);
-            }
-        }
+        userConnentService.ConnectIllness(user_id,Illness_Str);
 
         int end = userinfoService.UpdateByPrimaryKeySelective(user);
 
         if (end == 1){
-//            map.put("Infomation","成功");
-//            map.put("userName",name);
-//            map.put("userSex",sex);
-//            map.put("userBirthday",birthday);
-//            map.put("userHeight",height);
-//            map.put("userWeight",weight);
-//            map.put("userCcupation",occupation);
             return "成功";
         }
-        map.put("Infomation","成功");
         return "失败";
     }
 
@@ -434,158 +402,18 @@ public class UserController {
     }
 
     @RequestMapping("updateUserInfo4")
-    public String updateUserInfo4(@RequestParam("interestStr") String interestStr,
+    public void updateUserInfo4(@RequestParam("interestStr") String interestStr,
                                   @RequestParam("openid") String openid){
         Userinfo user = userinfoService.SelectByOpenid(openid);
-//        if (user == null){
-//            Userinfo new_user = new Userinfo();
-//            new_user.setUserOpenid(openid);
-//            userinfoService.insert(new_user);
-//            user = userinfoService.SelectByOpenid(openid);
-//        }
         int user_id = user.getUserId();
-
-        List<Integer> old_UIlist = interestService.SelectByUserId(user_id);
-
-        ArrayList<Integer> insertList = new ArrayList();
-        ArrayList<Integer> deleteList = new ArrayList();
-        ArrayList<Integer> restList = new ArrayList();
-
-        String[] interestArray = interestStr.split(",");
-        if (interestArray.length > 0){
-            for (int i = 0;i<interestArray.length;i++){
-                int interest_id = interestService.GetID(interestArray[i]);
-                insertList.add(interest_id);
-            }
-        }else{
-            interestService.DeleteByuserId(user_id);
-            return "用户口味已清空";
-        }
-
-        if (old_UIlist.size() != 0 && interestArray.length != 0){
-            for (int i = 0;i<old_UIlist.size();i++){
-                int old_UIid = old_UIlist.get(i);
-                deleteList.add(old_UIid);
-                for (int j = 0;j<insertList.size();j++){
-                    if (insertList.get(j) == old_UIid){
-                        restList.add(old_UIid);
-                        deleteList.remove(Integer.valueOf(old_UIid));
-                    }
-                }
-            }
-
-            if (restList.size() != 0){
-                for (int m = 0;m<insertList.size();m++){
-                    int in = insertList.get(m);
-                    for (int n = 0;n<restList.size();n++){
-                        int out = restList.get(n);
-                        if (out==in){
-                            insertList.remove(Integer.valueOf(in));
-                            m--;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (insertList.size() != 0){
-            for (int i = 0;i<insertList.size();i++){
-                int interest_id = insertList.get(i);
-                UserInterest UI = new UserInterest();
-                UI.setInterestId(interest_id);
-                UI.setUserId(user_id);
-                interestService.insertuserInterest(UI);
-            }
-        }
-        if (deleteList.size() != 0){
-            for (int i = 0;i<deleteList.size();i++){
-                int interest_id = deleteList.get(i);
-                UserInterest UI = new UserInterest();
-                UI.setInterestId(interest_id);
-                UI.setUserId(user_id);
-                interestService.DeleteByUserInterest(UI);
-            }
-        }
-
-        return "成功";
+        userConnentService.ConnectInterest(user_id,interestStr);
     }
 
     @RequestMapping("updateUserInfo5")
-    public String updateUserInfo5(@RequestParam("openid") String openid,@RequestParam("userills")String Illness_Str){
+    public void updateUserInfo5(@RequestParam("openid") String openid,@RequestParam("userills")String Illness_Str){
         Userinfo user = userinfoService.SelectByOpenid(openid);
-//        if (user == null){
-//            Userinfo new_user = new Userinfo();
-//            new_user.setUserOpenid(openid);
-//            userinfoService.insert(new_user);
-//            user = userinfoService.SelectByOpenid(openid);
-//        }
         int user_id = user.getUserId();
-
-        List<UserIllness> old_UIlist = userIllnessService.SelectByUserid(user_id);
-        ArrayList<Integer> insertList = new ArrayList();
-        ArrayList<Integer> deleteList = new ArrayList();
-        ArrayList<Integer> restList = new ArrayList();
-
-        String[] IllnessArray = Illness_Str.split(",");
-        if (!IllnessArray[0].equals("暂无")){
-            for (int i = 0;i<IllnessArray.length;i++){
-                Illness ill = illnessService.SelectByIllname(IllnessArray[i]);
-                int ill_id = ill.getIllId();
-                insertList.add(ill_id);
-            }
-        }else{
-            userIllnessService.DeleteByUserid(user_id);
-            return "已经清空用户疾病信息";
-        }
-
-        if (old_UIlist.size() != 0 && IllnessArray.length != 0){
-            for (int i = 0;i<old_UIlist.size();i++){
-                int old_UIid = old_UIlist.get(i).getIllId();
-                deleteList.add(old_UIid);
-                for (int j = 0;j<insertList.size();j++){
-                    if (insertList.get(j) == old_UIid){
-                        restList.add(old_UIid);
-                        deleteList.remove(Integer.valueOf(old_UIid));
-                    }
-                }
-            }
-
-            if (restList.size() != 0){
-                for (int m = 0;m<insertList.size();m++){
-                    int in = insertList.get(m);
-                    for (int n = 0;n<restList.size();n++){
-                        int out = restList.get(n);
-                        if (out==in){
-                            insertList.remove(Integer.valueOf(in));
-                            m--;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (insertList.size() != 0){
-            for (int i = 0;i<insertList.size();i++){
-                int ill_id = insertList.get(i);
-                UserIllness UI = new UserIllness();
-                UI.setIllId(ill_id);
-                UI.setUserId(user_id);
-                userIllnessService.insert(UI);
-            }
-        }
-        if (deleteList.size() != 0){
-            for (int i = 0;i<deleteList.size();i++){
-                int ill_id = deleteList.get(i);
-                UserIllness UI = new UserIllness();
-                UI.setIllId(ill_id);
-                UI.setUserId(user_id);
-                userIllnessService.DeleteByUserIll(UI);
-            }
-        }
-
-        return "成功";
+        userConnentService.ConnectIllness(user_id,Illness_Str);
     }
 
     //获得用户饮食记录表
@@ -728,6 +556,11 @@ public class UserController {
             double Standard_vitamin_C = intake.getSiVitaminC();
 
             List<DietRecord> DRlist = dietRecordService.GetUserWeeklySQL(LastWeeklyDate_Str,ThisWeeklyDate_Str,user_id);
+
+            if (DRlist.size() == 0){
+                FinalMap.put("错误码",400);
+                return FinalMap;
+            }
             int i = 0;
             int j = 0;
             /*

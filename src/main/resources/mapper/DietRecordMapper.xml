@@ -18,7 +18,7 @@
   </select>
 
   <select id="selectByDate" resultMap="BaseResultMap">
-    select * from dietrecord where DR_date LIKE CONCAT(CONCAT('%', #{dateStr}),'%')
+    select * from dietrecord where DR_date = #{dateStr,jdbcType=VARCHAR}
     and User_id = #{userId,jdbcType=INTEGER}
   </select>
 

@@ -20,8 +20,12 @@ public class faceController {
     @Autowired
     CompareImage testservice;
 
-    @GetMapping ("/face/face")
+    @GetMapping ("/face/compare")
     public String toFace() {
+        return "test.html";
+    }
+    @GetMapping ("/face/upload")
+    public String toupload() {
         return "index.html";
     }
 //比对用户

@@ -24,7 +24,7 @@
     function uploadPic(){
         var formData = new FormData($( "#pic" )[0]);
         $.ajax({
-            url: 'http://localhost:8080/user/compare' ,  /*这是处理文件上传的servlet*/
+            url: 'http://localhost:8080/user/uploadPic?openid=ohRyM1Wo0lcMj0-oM5JeX3CsI0GY' ,  /*这是处理文件上传的servlet*/
             type: 'POST',
             data: formData,
             async: false,
