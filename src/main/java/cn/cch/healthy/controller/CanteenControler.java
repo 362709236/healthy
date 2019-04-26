@@ -43,6 +43,9 @@ public class CanteenControler {
     @Autowired
     FoodService foodService;
 
+    @Autowired
+    UserinfoService userinfoService;
+
     @PostMapping("/getsell")
     public Map getsell() {
         String legend[]={"糖醋排骨","粉蒸肉","京酱肉丝","东坡肉","红烧鸡块","宫保鸡丁","剁椒鱼头"};
@@ -453,27 +456,49 @@ public class CanteenControler {
     * */
     @RequestMapping("selectAllDietRecordSub")
     public List selectAllDietRecordSub(@RequestParam("DR_id") int DR_id){
-        List<DietRecord_Sub> DRSlist = dietRecordService.SelectByDRid(DR_id);
-        List<String> resultlist = new ArrayList();
+        List<Integer> DRSlist = dietRecordService.SelectByDRid(DR_id);
+        List<Recipes> resultlist = new ArrayList();
         for (int j = 0;j<DRSlist.size();j++){
-            int recipes_id = DRSlist.get(j).getRecipesId();
-            String recipes_name = recipesService.getName(recipes_id);
-            resultlist.add(recipes_name);
+            int recipes_id = DRSlist.get(j);
+            Recipes recipes = recipesService.SelectByPrimaryKey(recipes_id);
+            resultlist.add(recipes);
         }
         return resultlist;
     }
 
     /*
-    *
+    *显示所有饮食记录
     * */
     @RequestMapping("selectAllDietRecord")
-    public List selectAllDietRecord(){
+    public List<HashMap> selectAllDietRecord(){
         List<DietRecord> DRlist = dietRecordService.selectAll();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         int i = 0;
-        List<Integer> resultlist = new ArrayList();
+        List<HashMap> resultlist = new ArrayList();
         while (i<DRlist.size()){
-            int DR_id = DRlist.get(i).getDrId();
-            resultlist.add(DR_id);
+            HashMap map = new HashMap();
+            int user_id = DRlist.get(i).getUserId();
+            Userinfo user = userinfoService.selectByPrimarykey(user_id);
+            String user_name = user.getUserName();
+            Date DR_date = DRlist.get(i).getDrDate();
+            String DR_dateStr = sdf.format(DR_date);
+            int DR_time = DRlist.get(i).getDrTime();
+            String DR_timeStr = "";
+            switch (DR_time){
+                case 1:
+                    DR_timeStr = "早餐";
+                    break;
+                case 2:
+                    DR_timeStr = "午餐";
+                    break;
+                case 3:
+                    DR_timeStr = "晚餐";
+                    break;
+            }
+            map.put("username",user_name);
+            map.put("date",DR_dateStr);
+            map.put("time",DR_timeStr);
+            resultlist.add(map);
             i++;
         }
         return resultlist;

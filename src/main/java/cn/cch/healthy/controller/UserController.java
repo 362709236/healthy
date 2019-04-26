@@ -501,6 +501,11 @@ public class UserController {
             List<Map> Combinelist1 = new ArrayList<>();
             List<Map> Combinelist2 = new ArrayList<>();
 
+            if (user.getUserAge() == null || user.getUserCcupation() == null || user.getUserSex() == null){
+                FinalMap.put("错误码",401);
+                return FinalMap;
+            }
+
             StandardIntake intake = standardIntakeService.getStandardIntake(user);
 
             //用户营养

@@ -20,5 +20,5 @@ public interface DietRecord_SubMapper {
 
     int updateByPrimaryKey(DietRecord_Sub record);
 
-    List<Integer> selectByDRid(Integer drId);
+    List selectByDRid(Integer drId);
 }
