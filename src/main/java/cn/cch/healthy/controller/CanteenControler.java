@@ -479,7 +479,6 @@ public class CanteenControler {
             HashMap map = new HashMap();
             int user_id = DRlist.get(i).getUserId();
             Userinfo user = userinfoService.selectByPrimarykey(user_id);
-            String user_name = user.getUserName();
             Date DR_date = DRlist.get(i).getDrDate();
             String DR_dateStr = sdf.format(DR_date);
             int DR_time = DRlist.get(i).getDrTime();
@@ -495,7 +494,8 @@ public class CanteenControler {
                     DR_timeStr = "晚餐";
                     break;
             }
-            map.put("username",user_name);
+            map.put("DRid",DRlist.get(i).getDrId());
+            map.put("userid",user_id);
             map.put("date",DR_dateStr);
             map.put("time",DR_timeStr);
             resultlist.add(map);

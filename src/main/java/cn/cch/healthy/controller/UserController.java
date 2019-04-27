@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -335,17 +336,12 @@ public class UserController {
     @RequestMapping(value = "insertUser",method = RequestMethod.POST)
     public int insertUser(@RequestParam("openid") String openid)
     {
-        Userinfo user = userinfoService.SelectByOpenid(openid);
-        if (user == null)
-        {
-            Userinfo new_user = new Userinfo();
-            new_user.setUserOpenid(openid);
-            userinfoService.insert(new_user);
-            return 0;
-        }else
-            {
-                return 1;
-            }
+        Userinfo new_user = new Userinfo();
+        new_user.setUserOpenid(openid);
+        int end = userinfoService.insert(new_user);
+        if (end == 1)
+            return 1;
+        return 0;
     }
 
     @RequestMapping("updateUserInfo1")
@@ -436,12 +432,6 @@ public class UserController {
     @RequestMapping("GetUserWeekdietRecord")
     public List<HashMap> GetUserWeekdietRecord(@RequestParam("openid") String openid){
         Userinfo user = userinfoService.SelectByOpenid(openid);
-//        if (user == null){
-//            Userinfo new_user = new Userinfo();
-//            new_user.setUserOpenid(openid);
-//            userinfoService.insert(new_user);
-//            user = userinfoService.SelectByOpenid(openid);
-//        }
         int user_id = user.getUserId();
         List<DietRecord> DRlist = dietRecordService.SelectUserWeekDiet(user_id);
         List<HashMap> resultList = new ArrayList<>();
@@ -490,6 +480,12 @@ public class UserController {
     }
 
     //用户周报信息
+    /*
+     * 200：成功
+     * 404：没有找到用户
+     * 400：没有饮食记录
+     * 401：用户信息不全
+     * */
     @RequestMapping("GetUserWeekly")
     public HashMap GetUserWeekly(@RequestParam("openid") String openid){
         HashMap FinalMap = new HashMap();
@@ -513,9 +509,6 @@ public class UserController {
             }
             String ThisWeeklyDate_Str = sdf.format(ThisWeeklyDate) + " 08:00:00";
             String LastWeeklyDate_Str = sdf.format(LastWeeklyDate) + " 08:00:00";
-
-            List<Map> Combinelist1 = new ArrayList<>();
-            List<Map> Combinelist2 = new ArrayList<>();
 
             if (user.getUserAge() == null || user.getUserCcupation() == null || user.getUserSex() == null){
                 FinalMap.put("错误码",401);
@@ -583,10 +576,8 @@ public class UserController {
                 return FinalMap;
             }
             int i = 0;
-            int j = 0;
-            /*
-            * 购买次数
-            * */
+            List<Map> Combinelist1 = new ArrayList<>();
+            List<Map> Combinelist2 = new ArrayList<>();
             while (i<DRlist.size()){
                 List<Integer> recipesList = dietRecordService.SelectByDRid(DRlist.get(i).getDrId());
                 int time = DRlist.get(i).getDrTime();
@@ -617,14 +608,17 @@ public class UserController {
                 //维生素C
                  All_vitamin_C2 += Standard_vitamin_C * number;
 
-                if (j < recipesList.size()){
+                 int j = 0;
+                while (j < recipesList.size()){
                     int recipes_id = recipesList.get(j);
                     Recipes recipes = recipesService.SelectByPrimaryKey(recipes_id);
                     String recipes_type = recipes.getRecipesType();
+
                     //素菜
                     Map<Integer,Integer> Combinemap1 = new HashMap<>();
                     //荤菜
                     Map<Integer,Integer> Combinemap2 = new HashMap<>();
+
                     if (recipes_type.indexOf("素菜") != -1){
                         Combinemap1.put(recipes_id,1);
                         Combinelist1.add(Combinemap1);
@@ -654,6 +648,23 @@ public class UserController {
                 }
                 i++;
             }
+
+            System.out.println("用户营养值"+"All_Energy："+All_Energy);
+            System.out.println("用户营养值"+"All_portein："+All_Energy);
+            System.out.println("用户营养值"+"All_fat："+All_fat);
+            System.out.println("用户营养值"+"All_vitamin_A："+All_vitamin_A);
+            System.out.println("用户营养值"+"All_vitamin_B_1："+All_vitamin_B_1);
+            System.out.println("用户营养值"+"All_vitamin_B_2："+All_vitamin_B_2);
+            System.out.println("用户营养值"+"All_vitamin_C："+All_vitamin_C);
+
+            System.out.println("标准营养值"+"All_Energy2："+All_Energy2);
+            System.out.println("标准营养值"+"All_portein2："+All_Energy2);
+            System.out.println("标准营养值"+"All_fat2："+All_fat2);
+            System.out.println("标准营养值"+"All_vitamin_A2："+All_vitamin_A2);
+            System.out.println("标准营养值"+"All_vitamin_B_12："+All_vitamin_B_12);
+            System.out.println("标准营养值"+"All_vitamin_B_22："+All_vitamin_B_22);
+            System.out.println("标准营养值"+"All_vitamin_C2："+All_vitamin_C2);
+
 
             List<Map.Entry<Integer,Integer>> list1 = getEntryMap(Combinelist1);
             List<Map.Entry<Integer,Integer>> list2 = getEntryMap(Combinelist2);
@@ -797,27 +808,81 @@ public class UserController {
             }
 
             //营养素百分比
-            DecimalFormat df = new DecimalFormat("#.00");
+            NumberFormat nf = NumberFormat.getNumberInstance();
+            // 保留两位小数
+            nf.setMaximumFractionDigits(2);
             //能量
-            double tage_Energy = (double) df.parse(String.valueOf(All_Energy/All_Energy2*100)) - 100;
+            double tage_Energy = 0;
+            if (All_Energy == 0){
+                tage_Energy = -100;
+            }else if (All_Energy/All_Energy2 >2){
+                tage_Energy = 100;
+            }else {
+                String tage_Energystr = nf.format(All_Energy/All_Energy2*100-100);
+                tage_Energy = Double.valueOf(tage_Energystr);
+            }
             //蛋白质
-            double tage_portein = (double) df.parse(String.valueOf(All_portein/All_portein2*100)) - 100;
+            double tage_portein = 0;
+            if (All_portein == 0){
+                tage_portein = -100;
+            }else if (All_portein/All_portein2 >2){
+                tage_portein = 100;
+            }else{
+                String tage_porteinstr = nf.format(All_portein/All_portein2*100-100);
+                tage_portein = Double.valueOf(tage_porteinstr);
+            }
             //脂肪
-            double tage_fat = (double) df.parse(String.valueOf(All_fat/All_fat2*100)) - 100;
+            double tage_fat = 0;
+            if (All_fat == 0){
+                tage_fat = -100;
+            }else if (All_fat/All_fat2 > 2){
+                tage_fat = 100;
+            }else {
+                String tage_fatstr = nf.format(All_fat/All_fat2*100-100);
+                tage_fat = Double.valueOf(tage_fatstr);
+            }
             //维生素A
-            double tage_vitamin_A = (double) df.parse(String.valueOf(All_vitamin_A/All_vitamin_A2*100)) - 100;
+            double tage_vitamin_A = 0;
+            if (All_vitamin_A == 0){
+                tage_vitamin_A = -100;
+            }else if (All_vitamin_A/All_vitamin_A2 >2){
+                tage_vitamin_A = 100;
+            }else{
+                String tage_vitamin_Astr = nf.format(All_vitamin_A/All_vitamin_A2*100-100);
+                tage_vitamin_A = Double.valueOf(tage_vitamin_Astr);
+            }
             //维生素B1
-            double tage_vitamin_B_1 = (double) df.parse(String.valueOf(All_vitamin_B_1/All_vitamin_B_12*100)) - 100;
+            double tage_vitamin_B_1 = 0;
+            if (All_vitamin_B_1 == 0){
+                tage_vitamin_B_1 = -100;
+            }else if (All_vitamin_B_1/All_vitamin_B_12 >2){
+                tage_vitamin_B_1 = 100;
+            }else{
+                String tage_vitamin_B_1str = nf.format(All_vitamin_B_1/All_vitamin_B_12*100-100);
+                tage_vitamin_B_1 = Double.valueOf(tage_vitamin_B_1str);
+            }
             //维生素B2
-            double tage_vitamin_B_2 = (double) df.parse(String.valueOf(All_vitamin_B_2/All_vitamin_B_22*100)) - 100;
+            double tage_vitamin_B_2 = 0;
+            if (All_vitamin_B_2 == 0){
+                tage_vitamin_B_2 = -100;
+            }else if (All_vitamin_B_2/All_vitamin_B_22 >2){
+                tage_vitamin_B_2 = 100;
+            }else{
+                String tage_vitamin_B_2str = nf.format(All_vitamin_B_2/All_vitamin_B_22*100-100);
+                tage_vitamin_B_2 = Double.valueOf(tage_vitamin_B_2str);
+            }
             //维生素C
 //            System.out.println(All_vitamin_C/All_vitamin_C2);
 //            System.out.println();
             double tage_vitamin_C = 0;
             if (All_vitamin_C == 0){
                 tage_vitamin_C = -100;
-            }else{
-                tage_vitamin_C = (double) df.parse(String.valueOf(All_vitamin_C/All_vitamin_C2*100).substring(5)) - 100;
+            }else if (All_vitamin_C/All_vitamin_C2 > 2){
+                tage_vitamin_C = 100;
+            } else{
+                String tage_vitamin_Cstr = nf.format(All_vitamin_C/All_vitamin_C2*100-100);
+                tage_vitamin_C = Double.valueOf(tage_vitamin_Cstr);
+//                tage_vitamin_C = (double) df.parse(String.valueOf(All_vitamin_C/All_vitamin_C2*100).substring(5)) - 100;
             }
 
 
@@ -890,11 +955,11 @@ public class UserController {
             int probsnum = 0;
             Probs1 = sortByValueDescending(Probs1);
             Map Probs_map2 = new HashMap();
-            System.out.println("基于value值的降序，排序输出结果为：");
+//            System.out.println("基于value值的降序，排序输出结果为：");
             for (Map.Entry<String, Double> entry : Probs1.entrySet()) {
                 if (probsnum == 1)
                     break;
-                if (entry.getValue() > 100){
+                if (entry.getValue() >= 100){
                     Probs_map2.put("食用过多",entry.getKey());
                 }
 
@@ -904,42 +969,48 @@ public class UserController {
             probsnum = 0;
 //            System.out.println("基于value值的升序，排序输出结果为：");
             Probs2 = sortByValueAscending(Probs2);
-            for (Map.Entry<String, Double> entry : Probs2.entrySet()) {
-                if (probsnum == 1)
-                    break;
-                Probs_map.put("食用过少",entry.getKey());
-                int[] arraynum = randomCommon(0,9,3);
-                if (entry.getKey().equals("能量")){
-                    Probs_map.put("菜品1",EnergyArray[arraynum[0]]);
-                    Probs_map.put("菜品2",EnergyArray[arraynum[1]]);
-                    Probs_map.put("菜品3",EnergyArray[arraynum[2]]);
-                }else if (entry.getKey().equals("蛋白质")){
-                    Probs_map.put("菜品1",porteinArray[arraynum[0]]);
-                    Probs_map.put("菜品2",porteinArray[arraynum[1]]);
-                    Probs_map.put("菜品3",porteinArray[arraynum[2]]);
-                }else if (entry.getKey().equals("脂肪")){
-                    Probs_map.put("菜品1",fatArray[arraynum[0]]);
-                    Probs_map.put("菜品2",fatArray[arraynum[1]]);
-                    Probs_map.put("菜品3",fatArray[arraynum[2]]);
-                }else if (entry.getKey().equals("维生素A")){
-                    Probs_map.put("菜品1",vitamin_AArray[arraynum[0]]);
-                    Probs_map.put("菜品2",vitamin_AArray[arraynum[1]]);
-                    Probs_map.put("菜品3",vitamin_AArray[arraynum[2]]);
-                }else if (entry.getKey().equals("维生素B1")){
-                    Probs_map.put("菜品1",vitamin_B_1Array[arraynum[0]]);
-                    Probs_map.put("菜品2",vitamin_B_1Array[arraynum[1]]);
-                    Probs_map.put("菜品3",vitamin_B_1Array[arraynum[2]]);
-                }else if (entry.getKey().equals("维生素B2")){
-                    Probs_map.put("菜品1",vitamin_B_2Array[arraynum[0]]);
-                    Probs_map.put("菜品2",vitamin_B_2Array[arraynum[1]]);
-                    Probs_map.put("菜品3",vitamin_B_2Array[arraynum[2]]);
-                }else if (entry.getKey().equals("维生素C")){
-                    Probs_map.put("菜品1",vitamin_CArray[arraynum[0]]);
-                    Probs_map.put("菜品2",vitamin_CArray[arraynum[1]]);
-                    Probs_map.put("菜品3",vitamin_CArray[arraynum[2]]);
-                }
+            if (Probs2.size() == 0){
+                Probs_map.put("报告值",0);
+            }else{
+                for (Map.Entry<String, Double> entry : Probs2.entrySet()) {
+                    if (probsnum == 1)
+                        break;
+                    Probs_map.put("报告值",1);
+                    Probs_map.put("食用过少",entry.getKey());
+                    int[] arraynum = randomCommon(0,9,3);
+                    if (entry.getKey().equals("能量")){
+                        Probs_map.put("菜品1",EnergyArray[arraynum[0]]);
+                        Probs_map.put("菜品2",EnergyArray[arraynum[1]]);
+                        Probs_map.put("菜品3",EnergyArray[arraynum[2]]);
+                    }else if (entry.getKey().equals("蛋白质")){
+                        Probs_map.put("菜品1",porteinArray[arraynum[0]]);
+                        Probs_map.put("菜品2",porteinArray[arraynum[1]]);
+                        Probs_map.put("菜品3",porteinArray[arraynum[2]]);
+                    }else if (entry.getKey().equals("脂肪")){
+                        Probs_map.put("菜品1",fatArray[arraynum[0]]);
+                        Probs_map.put("菜品2",fatArray[arraynum[1]]);
+                        Probs_map.put("菜品3",fatArray[arraynum[2]]);
+                    }else if (entry.getKey().equals("维生素A")){
+                        Probs_map.put("菜品1",vitamin_AArray[arraynum[0]]);
+                        Probs_map.put("菜品2",vitamin_AArray[arraynum[1]]);
+                        Probs_map.put("菜品3",vitamin_AArray[arraynum[2]]);
+                    }else if (entry.getKey().equals("维生素B1")){
+                        Probs_map.put("菜品1",vitamin_B_1Array[arraynum[0]]);
+                        Probs_map.put("菜品2",vitamin_B_1Array[arraynum[1]]);
+                        Probs_map.put("菜品3",vitamin_B_1Array[arraynum[2]]);
+                    }else if (entry.getKey().equals("维生素B2")){
+                        Probs_map.put("菜品1",vitamin_B_2Array[arraynum[0]]);
+                        Probs_map.put("菜品2",vitamin_B_2Array[arraynum[1]]);
+                        Probs_map.put("菜品3",vitamin_B_2Array[arraynum[2]]);
+                    }else if (entry.getKey().equals("维生素C")){
+                        Probs_map.put("菜品1",vitamin_CArray[arraynum[0]]);
+                        Probs_map.put("菜品2",vitamin_CArray[arraynum[1]]);
+                        Probs_map.put("菜品3",vitamin_CArray[arraynum[2]]);
+                    }
 //                System.out.println("key= " + entry.getKey() + " and value= " + entry.getValue());
-                probsnum++;
+                    probsnum++;
+                }
+
             }
 
             FinalMap.put("错误码",200);
@@ -1087,29 +1158,34 @@ public class UserController {
 
     @Test
     public void aaaa(){
-        Date now_date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        try {
-
-            Date ThisWeeklyDate;
-            Date LastWeeklyDate;
-            if (now_date.compareTo(getThisWeekMonday(now_date)) == -1){
-                ThisWeeklyDate = geLastWeekMonday(now_date);
-                LastWeeklyDate = geLLastWeekMonday(now_date);
-            }else{
-                ThisWeeklyDate = getThisWeekMonday(now_date);
-                LastWeeklyDate = geLastWeekMonday(now_date);
-            }
-            String ThisWeeklyDate_Str = sdf.format(ThisWeeklyDate) + " 08:00:00";
-            String LastWeeklyDate_Str = sdf.format(LastWeeklyDate) + " 08:00:00";
-
-            System.out.println("本周一" + ThisWeeklyDate_Str);
-            System.out.println("上周一" + LastWeeklyDate_Str);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        String dou = "2755.55";
+        double dd = Double.parseDouble(dou);
+        double dd2 = Double.valueOf(dou);
+        System.out.println(dd2);
+        System.out.println(dd);
+//        Date now_date = new Date();
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        try {
+//
+//            Date ThisWeeklyDate;
+//            Date LastWeeklyDate;
+//            if (now_date.compareTo(getThisWeekMonday(now_date)) == -1){
+//                ThisWeeklyDate = geLastWeekMonday(now_date);
+//                LastWeeklyDate = geLLastWeekMonday(now_date);
+//            }else{
+//                ThisWeeklyDate = getThisWeekMonday(now_date);
+//                LastWeeklyDate = geLastWeekMonday(now_date);
+//            }
+//            String ThisWeeklyDate_Str = sdf.format(ThisWeeklyDate) + " 08:00:00";
+//            String LastWeeklyDate_Str = sdf.format(LastWeeklyDate) + " 08:00:00";
+//
+//            System.out.println("本周一" + ThisWeeklyDate_Str);
+//            System.out.println("上周一" + LastWeeklyDate_Str);
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
 }
