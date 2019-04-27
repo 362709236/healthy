@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -331,6 +332,21 @@ public class UserController {
             return null;
         }
     }*/
+    @RequestMapping(value = "insertUser",method = RequestMethod.POST)
+    public int insertUser(@RequestParam("openid") String openid)
+    {
+        Userinfo user = userinfoService.SelectByOpenid(openid);
+        if (user == null)
+        {
+            Userinfo new_user = new Userinfo();
+            new_user.setUserOpenid(openid);
+            userinfoService.insert(new_user);
+            return 0;
+        }else
+            {
+                return 1;
+            }
+    }
 
     @RequestMapping("updateUserInfo1")
     public String updateUserInfo1(@RequestParam("openid") String openid,@RequestParam("type") String type,
@@ -338,10 +354,10 @@ public class UserController {
         Userinfo user = userinfoService.SelectByOpenid(openid);
         if (user == null)
         {
-            Userinfo new_user = new Userinfo();
+            /*Userinfo new_user = new Userinfo();
             new_user.setUserOpenid(openid);
-            userinfoService.insert(new_user);
-            return "成功";
+            userinfoService.insert(new_user);*/
+            return "用户不存在";
        }
         user.setUserType(type);
         user.setUserNumber(numberID);
