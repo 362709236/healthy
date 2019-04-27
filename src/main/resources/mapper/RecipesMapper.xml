@@ -67,7 +67,9 @@
   </select>
   
   <select id="vagueSelectRecipes" resultMap="BaseResultMap">
-    select * from recipes where Recipes_name LIKE #{recipesName,jdbcType=VARCHAR}
+    select * from recipes
+    where Recipes_name LIKE #{recipesName,jdbcType=VARCHAR}
+    OR Recipes_type LIKE #{recipesName,jdbcType=VARCHAR}
   </select>
   
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
