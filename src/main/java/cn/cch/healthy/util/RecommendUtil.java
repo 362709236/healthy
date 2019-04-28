@@ -74,7 +74,7 @@ public class RecommendUtil {
     /*
     * 推荐算法
     * */
-    public Map recommend_score(int userId) throws Exception {
+    public Map recommend_score(int userId,int num) throws Exception {
         Userinfo consumer = recommendUtil.userinfoService.selectByPrimarykey(userId);
         System.out.println(consumer.toString());
         //若用户没有填写性别和年龄   就无法推送
@@ -104,9 +104,9 @@ public class RecommendUtil {
         StandardIntake intake = recommendUtil.standardIntakeService.getStandardIntake(consumer);
         //获得数据库中当前时间段所有套餐
         List<SetmealInfomation> setMealList =
-                recommendUtil.setmealInfomationService.SelectByTime(time>2?3:2,30);
+                recommendUtil.setmealInfomationService.SelectByTime(time>2?3:2,num);
         List<Map> eatingRecord = dietRecordService.selectRecentRecord(userId,3,time);
-        System.out.println("食用记录"+eatingRecord.toString());
+       // System.out.println("食用记录"+eatingRecord.toString());
         double [] score = new double[setMealList.size()];
         for(int i=0;i<setMealList.size();i++)
         {
@@ -130,10 +130,8 @@ public class RecommendUtil {
                 }
             }
         }
-        for(int i=0;i<setMealList.size();i++)
-        {
-            System.out.println("套餐"+i+"的最终得分为"+score[i]);
-        }
+       // for(int i=0;i<setMealList.size();i++)
+         //   System.out.println("套餐号"+setMealList.get(i).getSmId()+"的最终得分为"+score[i]);
         //添加推送记录
         PushInfomation pushInfomation = new PushInfomation();
         pushInfomation.setUserId(consumer.getUserId());
@@ -154,7 +152,11 @@ public class RecommendUtil {
             }
             setmeals.add(recipeName);
         }
+        List<Integer> Ids = new ArrayList<Integer>();
+        for(int i=0;i<3;i++)
+            Ids.add(setMealList.get(i).getSmId());
         map.put("recipes",setmeals);
+        map.put("setmealsId",Ids);
         return map;
     }
 
@@ -185,14 +187,14 @@ public class RecommendUtil {
         double score_protein = 10-distance/3;
         if (score_protein<0)
             score_protein=0;
-        System.out.println("蛋白质打分完成！分数为"+score_protein);
+      //  System.out.println("蛋白质打分完成！分数为"+score_protein);
         //能量打分
         distance = Math.abs(setmeal.getSiEnergy()*0.8-energyFormula(consumer.getUserSex()
                 ,consumer.getUserWeight(),consumer.getUserHeight(),consumer.getUserAge())*rate);
         double score_energy = 10-distance/30;
         if(score_energy<0)
             score_energy=0;
-        System.out.println("能量打分完成！分数为"+score_energy);
+      //  System.out.println("能量打分完成！分数为"+score_energy);
         //近期是否吃过相同菜品打分
         double deScore=0;
         for(int i=0;i<recipeList.size();i++)
@@ -207,14 +209,14 @@ public class RecommendUtil {
         double score_recent = deScore;
         if(score_recent>10)
             score_recent=10;
-        System.out.println("近期吃过的菜品打分完成！分数为"+score_recent);
+      //  System.out.println("近期吃过的菜品打分完成！分数为"+score_recent);
         //食堂剩余量打分
         //是否符合用户爱好打分
         double matchDegree = interestService.match(setmeal.getSmId(),consumer.getUserId())*2;
         double score_match = matchDegree;
         if (score_match>10)
             score_match=10;
-        System.out.println("用户爱好打分完成！分数为"+score_match);
+     //   System.out.println("用户爱好打分完成！分数为"+score_match);
 
         //根据用户当前疾病打分
         List<Integer> illness = userIllnessService.SelectByUserid(consumer.getUserId());
@@ -255,17 +257,17 @@ public class RecommendUtil {
         }
         if (score_illness>10)
             score_illness=10;
-        System.out.println("用户疾病打分完成！分数为"+score_illness);
+      //  System.out.println("用户疾病打分完成！分数为"+score_illness);
 
         //计算最终得分
         double finalScore=score_protein*PROTEINWEIGHT+score_energy*ENERGYWEIGHT
                 +score_recent*RECENTWEIGHT+score_match*INTERESTWEIGHT+
                 0*ILLNESSWEIGHT;
-        System.out.println("---------------打分成功---------"+finalScore+"--------");
+        System.out.println("------------套餐号"+setmeal.getSmId()+"打分成功---------"+finalScore+"--------");
         return finalScore;
     }
 
-    private double energyFormula(String sex,double weight,double height,int age)
+    public double energyFormula(String sex,double weight,double height,int age)
     {
         if (sex.equals("男"))
             return 66+13.7*weight+5*height+6.8*age;

@@ -25,4 +25,6 @@ public class SetmealInfomationService {
 
     public List<String> SelectAllForName(){ return mapper.selectAllForName(); }
 
+    public SetmealInfomation selectByPrimaryKey(int smId){return mapper.selectByPrimaryKey(smId);}
+
 }
