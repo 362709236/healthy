@@ -34,11 +34,11 @@ public class SetmealController {
     @Autowired
     InterestService interestService;
 
-    private int start=341;
+    private int start=30;
 
 
-    //套餐自动生成（一荤一素）-------中餐
-    @RequestMapping("autoForm_1_1")
+    //套餐自动生成（一荤一素）-------正餐
+   // @RequestMapping("autoForm_1_1")
     public String autoForm_1_1()
     {
         List<Recipes> meatDishList =recipesService.getRecipesByType("荤菜");
@@ -55,8 +55,8 @@ public class SetmealController {
         }
         return "成功！";
     }
-    //套餐自动生成（一荤一素一汤）--------中餐
-    @RequestMapping("autoForm_1_1_1")
+    //套餐自动生成（一荤一素一汤）--------正餐
+  //  @RequestMapping("autoForm_1_1_1")
     public String autoForm_1_1_1()
     {
         List<Recipes> meatDishList =recipesService.getRecipesByType("荤菜");
@@ -84,6 +84,67 @@ public class SetmealController {
         return "成功！";
     }
 
+    //套餐自动生成（一面条一配菜）-------早餐
+  //  @RequestMapping("autoForm_break_1_1")
+    public String autoForm_break_1_1()
+    {
+        List<Recipes> noodleList =recipesService.getRecipesByType("面条");
+        for (int i=0;i<noodleList.size();i++)
+        {
+                int sm_id = insertSM("早餐"+start);
+                int recipesArray[] = {noodleList.get(i).getRecipesId()};
+                updateSM(recipesArray,sm_id,1);
+                System.out.println("成功添加早餐"+(start++));
+        }
+        return "成功！";
+    }
+
+    //套餐自动生成（一馒头一配菜一饮料）-------早餐
+   // @RequestMapping("autoForm_break_1_1_1")
+    public String autoForm_break_1_1_1()
+    {
+        List<Recipes> baoList =recipesService.getRecipesByType("馒头");
+        List<Recipes> subList = recipesService.getRecipesByType("配菜");
+        List<Recipes> drinkList = recipesService.getRecipesByType("饮料");
+        for (int i=0;i<baoList.size();i++)
+        {
+            for (int j=0;j<subList.size();j++)
+            {
+                for(int z=0;z<drinkList.size();z++)
+                {
+                    int drinkId = drinkList.get(z).getRecipesId();
+                    int subId = subList.get(j).getRecipesId();
+                    int baoId = baoList.get(i).getRecipesId();
+                    int sm_id = insertSM("早餐"+start);
+                    int recipesArray[] = {baoId,subId, drinkId};
+                    updateSM(recipesArray,sm_id,1);
+                    System.out.println("成功添加早餐"+(start++));
+                }
+            }
+        }
+        return "成功！";
+    }
+
+    //套餐自动生成（一馒头一饮料）-------早餐
+   // @RequestMapping("autoForm_break2_1_1_1")
+    public String autoForm_break2_1_1()
+    {
+        List<Recipes> baoList =recipesService.getRecipesByType("馒头");
+        List<Recipes> drinkList = recipesService.getRecipesByType("饮料");
+        for (int i=0;i<baoList.size();i++)
+        {
+                for(int z=0;z<drinkList.size();z++)
+                {
+                    int drinkId = drinkList.get(z).getRecipesId();
+                    int baoId = baoList.get(i).getRecipesId();
+                    int sm_id = insertSM("早餐"+start);
+                    int recipesArray[] = {baoId, drinkId};
+                    updateSM(recipesArray,sm_id,1);
+                    System.out.println("成功添加早餐"+(start++));
+                }
+        }
+        return "成功！";
+    }
     //新增套餐
     //@RequestMapping("insert")
     public int insertSM(String name){

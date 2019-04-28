@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据发射器</title>
+    <script type="text/javascript" src="/static/js/jquery-3.3.1.min.js"></script>
+    <script>
+        function sendData() {
+            var userId = $('#userId').val()
+            $.ajax
+            ({
+                url:"test",
+                method:"post",
+                data:
+                    {
+                        userId:userId
+                    },
+                success:function (data) {
+                    alert(data.recipes[0]);
+                    var pro = "<tr>\n" +
+                        "            <th colspan=\"4\" align=\"center\">饮食推送测试器</th>\n" +
+                        "        </tr>\n" +
+                        "        <tr align=\"center\">\n" +
+                        "            <td colspan=\"2\">用户ID</td>\n" +
+                        "            <td colspan=\"2\">就餐时间</td>\n" +
+                        "        </tr>\n" +
+                        "        <tr>\n" +
+                        "            <td colspan=\"2\"><input type=\"text\" id=\"userId\" name=\"userId\"></td>\n" +
+                        "            <td colspan=\"2\"><input type=\"text\" id=\"time\" name=\"time\"></td>\n" +
+                        "        </tr>\n" +
+                        "        <tr>\n" +
+                        "            <td colspan=\"4\" align=\"center\"><input type=\"button\" onclick=\"sendData()\" value=\"发射\"></td>\n" +
+                        "        </tr>"
+                    var restable = "<tr>\n" +
+                        "            <td align=\"center\">套餐号</td>\n" +
+                        "            <td align=\"center\">菜品一</td>\n" +
+                        "            <td align=\"center\">菜品二</td>\n" +
+                        "            <td align=\"center\">菜品三</td>\n" +
+                        "        </tr>"
+                    for(var i=0;i<data.recipes.length;i++)
+                    {
+                        restable+="<tr>\n" +
+                            "            <td>"+i+"</td>";
+                        for (var j=0;j<data.recipes[i].length;j++)
+                        {
+                            restable+="<td>"+data.recipes[i][j]+"</td>"
+                        }
+                        restable+="</tr>"
+                    }
+                    $('#content').html(pro+restable)
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <table id="content" border="1">
+        <tr>
+            <th colspan="4" align="center">饮食推送测试器</th>
+        </tr>
+        <tr align="center">
+            <td colspan="2">用户ID</td>
+            <td colspan="2">就餐时间</td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="text" id="userId" name="userId"></td>
+            <td colspan="2"><input type="text" id="time" name="time"></td>
+        </tr>
+        <tr>
+            <td colspan="4" align="center"><input type="button" onclick="sendData()" value="发射"></td>
+        </tr>
+    </table>
+    <table id="result" border="1">
+        <tr>
+            <th>推送套餐分析</th>
+        </tr>
+        <tr>
+            <td>套餐号</td>
+            <td>蛋白质(g/100g)</td>
+            <td>脂肪(g/100g)</td>
+            <td>热量(kcal/100g)</td>
+            <td>维生素A(ug/100g)</td>
+            <td>维生素B(ug/100g)</td>
+            <td>维生素C(ug/100g)</td>
+            <td>Fe(ug/100g)</td>
+            <td>Mg(ug/100g)</td>
+            <td>Ca(ug/100g)</td>
+            <td>Zn(ug/100g)</td>
+        </tr>
+
+    </table>
+</body>
+</html>

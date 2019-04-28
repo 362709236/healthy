@@ -280,12 +280,17 @@ public class UserController {
     @RequestMapping(value = "insertUser",method = RequestMethod.POST)
     public int insertUser(@RequestParam("openid") String openid)
     {
-        Userinfo new_user = new Userinfo();
-        new_user.setUserOpenid(openid);
-        int end = userinfoService.insert(new_user);
-        if (end == 1)
+        Userinfo user = userinfoService.SelectByOpenid(openid);
+        if (user == null)
+        {
+            Userinfo new_user = new Userinfo();
+            new_user.setUserOpenid(openid);
+            userinfoService.insert(new_user);
+            return 0;
+        }else
+        {
             return 1;
-        return 0;
+        }
     }
 
     @RequestMapping("updateUserInfo1")
