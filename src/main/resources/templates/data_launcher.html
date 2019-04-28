@@ -7,22 +7,23 @@
     <script>
         function sendData() {
             var userId = $('#userId').val()
+            var num = $('#num').val()
             $.ajax
             ({
                 url:"test",
                 method:"post",
                 data:
                     {
-                        userId:userId
+                        userId:userId,
+                        num:num
                     },
                 success:function (data) {
-                    alert(data.recipes[0]);
                     var pro = "<tr>\n" +
                         "            <th colspan=\"4\" align=\"center\">饮食推送测试器</th>\n" +
                         "        </tr>\n" +
                         "        <tr align=\"center\">\n" +
                         "            <td colspan=\"2\">用户ID</td>\n" +
-                        "            <td colspan=\"2\">就餐时间</td>\n" +
+                        "            <td colspan=\"2\">精确度</td>\n" +
                         "        </tr>\n" +
                         "        <tr>\n" +
                         "            <td colspan=\"2\"><input type=\"text\" id=\"userId\" name=\"userId\"></td>\n" +
@@ -48,6 +49,120 @@
                         restable+="</tr>"
                     }
                     $('#content').html(pro+restable)
+
+                    //标准摄入量参考表
+                    var intakeHtml = "<tr>\n" +
+                        "            <th colspan=\"7\">推荐标准摄入量</th>\n" +
+                        "        </tr>\n" +
+                        "        <tr>\n" +
+                        "            <td>用户ID</td>\n" +
+                        "            <td>蛋白质(g/100g)</td>\n" +
+                        "            <td>脂肪(g/100g)</td>\n" +
+                        "            <td>热量(kcal/100g)</td>\n" +
+                        "            <td>维生素A(ug/100g)</td>\n" +
+                        "            <td>维生素B(ug/100g)</td>\n" +
+                        "            <td>维生素C(ug/100g)</td>\n" +
+                        "        </tr>"
+                    var addIntakeHtml = "<tr>\n" +
+                        "            <td>"+userId+"</td>\n" +
+                        "            <td>"+data.standardIntake.siPortein+"</td>\n" +
+                        "            <td>"+data.standardIntake.siEnergy*0.25+"</td>\n" +
+                        "            <td>"+data.energyNeed+"</td>\n" +
+                        "            <td>"+data.standardIntake.siVitaminA+"</td>\n" +
+                        "            <td>"+data.standardIntake.siVitaminB1+"</td>\n" +
+                        "            <td>"+data.standardIntake.siVitaminC+"</td>\n" +
+                        "        </tr>"
+                    $('#standard_intake').html(intakeHtml+addIntakeHtml)
+
+                    //套餐数据分析表
+                    var analyseHtml = "<tr>\n" +
+                        "            <th colspan=\"11\">推送套餐分析</th>\n" +
+                        "        </tr>\n" +
+                        "        <tr>\n" +
+                        "            <td>套餐号</td>\n" +
+                        "            <td>蛋白质(g/100g)</td>\n" +
+                        "            <td>脂肪(g/100g)</td>\n" +
+                        "            <td>热量(kcal/100g)</td>\n" +
+                        "            <td>维生素A(ug/100g)</td>\n" +
+                        "            <td>维生素B(ug/100g)</td>\n" +
+                        "            <td>维生素C(ug/100g)</td>\n" +
+                        "            <td>Fe(ug/100g)</td>\n" +
+                        "            <td>Mg(ug/100g)</td>\n" +
+                        "            <td>Ca(ug/100g)</td>\n" +
+                        "            <td>Zn(ug/100g)</td>\n" +
+                        "        </tr>"
+                    for(var i=0;i<data.setmealInformation.length;i++)
+                    {
+                        var siVitaminA = "";
+                        if(data.setmealInformation[i].siVitaminA=="3")
+                            siVitaminA = "高"
+                        else if(data.setmealInformation[i].siVitaminA=="2")
+                            siVitaminA = "中"
+                        else
+                            siVitaminA = "低"
+                        var siVitaminB = "";
+                        if(data.setmealInformation[i].siVitaminB=="3")
+                            siVitaminB = "高"
+                        else if(data.setmealInformation[i].siVitaminB=="2")
+                            siVitaminB = "中"
+                        else
+                            siVitaminB = "低"
+                        var siVitaminC = "";
+                        if(data.setmealInformation[i].siVitaminC=="3")
+                            siVitaminC = "高"
+                        else if(data.setmealInformation[i].siVitaminC=="2")
+                            siVitaminC = "中"
+                        else
+                            siVitaminC = "低"
+                        var siFe = "";
+                        if(data.setmealInformation[i].siFe=="3")
+                            siFe = "高"
+                        else if(data.setmealInformation[i].siFe=="2")
+                            siFe = "中"
+                        else
+                            siFe = "低"
+                        var siMg = "";
+                        if(data.setmealInformation[i].siMg=="3")
+                            siMg = "高"
+                        else if(data.setmealInformation[i].siMg=="2")
+                            siMg = "中"
+                        else
+                            siMg = "低"
+                        var siCa = "";
+                        if(data.setmealInformation[i].siCa=="3")
+                            siCa = "高"
+                        else if(data.setmealInformation[i].siCa=="2")
+                            siCa = "中"
+                        else
+                            siCa = "低"
+                        var siZn = "";
+                        if(data.setmealInformation[i].siZn=="3")
+                            siZn = "高"
+                        else if(data.setmealInformation[i].siZn=="2")
+                            siZn = "中"
+                        else
+                            siZn = "低"
+                        analyseHtml+="<tr>\n" +
+                            "            <td>"+i+"</td>\n" +
+                            "            <td>"+data.setmealInformation[i].siPortein+"</td>\n" +
+                            "            <td>"+data.setmealInformation[i].siFat+"</td>\n" +
+                            "            <td>"+data.setmealInformation[i].siEnergy+"</td>\n" +
+                            "            <td>"+siVitaminA+"</td>\n" +
+                            "            <td>"+siVitaminB+"</td>\n" +
+                            "            <td>"+siVitaminC+"</td>\n" +
+                            "            <td>"+siFe+"</td>\n" +
+                            "            <td>"+siMg+"</td>\n" +
+                            "            <td>"+siCa+"</td>\n" +
+                            "            <td>"+siZn+"</td>\n" +
+                            "        </tr>"
+                        analyseHtml+="<tr>\n" +
+                            "            <td>偏移率</td>\n" +
+                            "            <td>"+data.proteinRate[i].toFixed(4)+"</td>\n" +
+                            "            <td>"+data.fatRate[i].toFixed(4)+"</td>\n" +
+                            "            <td>"+data.energyRate[i].toFixed(4)+"</td>\n" +
+                            "        </tr>"
+                    }
+                    $('#result').html(analyseHtml)
                 }
             })
         }
@@ -60,34 +175,22 @@
         </tr>
         <tr align="center">
             <td colspan="2">用户ID</td>
-            <td colspan="2">就餐时间</td>
+            <td colspan="2">精确度</td>
         </tr>
         <tr>
             <td colspan="2"><input type="text" id="userId" name="userId"></td>
-            <td colspan="2"><input type="text" id="time" name="time"></td>
+            <td colspan="2"><input type="text" id="num" name="num"></td>
         </tr>
         <tr>
             <td colspan="4" align="center"><input type="button" onclick="sendData()" value="发射"></td>
         </tr>
     </table>
-    <table id="result" border="1">
-        <tr>
-            <th>推送套餐分析</th>
-        </tr>
-        <tr>
-            <td>套餐号</td>
-            <td>蛋白质(g/100g)</td>
-            <td>脂肪(g/100g)</td>
-            <td>热量(kcal/100g)</td>
-            <td>维生素A(ug/100g)</td>
-            <td>维生素B(ug/100g)</td>
-            <td>维生素C(ug/100g)</td>
-            <td>Fe(ug/100g)</td>
-            <td>Mg(ug/100g)</td>
-            <td>Ca(ug/100g)</td>
-            <td>Zn(ug/100g)</td>
-        </tr>
-
-    </table>
+    <br>
+    <table id="standard_intake" border="1"></table>
+    <br>
+    <table id="result" border="1"></table>
+<br>
+<br>
+<br>
 </body>
 </html>
