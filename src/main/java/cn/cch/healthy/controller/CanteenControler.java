@@ -2,7 +2,6 @@ package cn.cch.healthy.controller;
 
 import cn.cch.healthy.model.*;
 import cn.cch.healthy.service.*;
-import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,8 +63,7 @@ public class CanteenControler {
         mymap.put("totaldata",totaldata);
         return mymap;
     }
-
-
+    
     /*
     * 菜谱配方接口
     * */
@@ -100,13 +98,6 @@ public class CanteenControler {
         }
         return null;
     }
-
-
-    public String selectAllFormula(){
-
-        return "";
-    }
-
     /*
     * 设置套餐接口
     * SetmealController  updateSM()
@@ -309,23 +300,11 @@ public class CanteenControler {
                                 @RequestParam("file") MultipartFile file,
                                 @RequestParam("Recipes_price") String Recipes_price,
                                 @RequestParam("Recipes_margin") String Recipes_margin) throws IOException {
-//        Recipes haverecipes = recipesService.SelectByName(Recipes_name);
         Recipes recipes = recipesService.SelectByPrimaryKey(Recipes_id);
         String Recipes_img = upload(file,String.valueOf(Recipes_id));
         if (Recipes_img.equals("fail")){
             return "文件上传失败";
         }
-
-//        if (haverecipes == null){
-//            Recipes recipes = new Recipes();
-//            recipes.setRecipesName(Recipes_name);
-//            //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8080/Img/xxxx.png
-//            recipes.setRecipesImg(Recipes_img);
-//            recipes.setRecipesPrice(Double.valueOf(Recipes_price));
-//            recipes.setRecipesMargin(Double.valueOf(Recipes_margin));
-//            recipesService.insert(recipes);
-//            return "成功";
-//        }
         recipes.setRecipesName(Recipes_name);
         //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8080/Img/xxxx.png
         recipes.setRecipesImg("http://118.126.65.227:8080/Img/"+Recipes_img);
@@ -503,15 +482,6 @@ public class CanteenControler {
         }
         return resultlist;
     }
-
-    /*
-    * 数据分析图表接口
-    * */
-    public String DataAnalysis(){
-
-        return "";
-    }
-
     /*
     * 数据设置器
     */
@@ -697,20 +667,5 @@ public class CanteenControler {
             System.out.println(food_id.getFoodCa());
         }
         System.out.println(food_id);
-    }
-
-    @Test
-    public void test(){
-        String str = "";
-        String[] arr = str.split(",");
-//        for (String string : arr) {
-//            System.out.println("str"+string);
-//        }
-        if (arr[0].equals("")){
-            System.out.println("arr is null");
-        }
-        System.out.println("arr:"+arr[0]);
-        System.out.println(arr.length);
-
     }
 }

@@ -5,6 +5,7 @@ import cn.cch.healthy.service.*;
 import cn.cch.healthy.util.*;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,13 +108,13 @@ public class UserController {
     //比对用户
     @RequestMapping("/compare")
     public String CompareFace(String file) throws Exception {
+        System.out.println(file);
         List<String> faceList=testservice.test2(file);
 
         Map map = new HashMap();
         List<Userinfo> userList=userinfoService.SelectAll();  //获取所有用户
         long nd = 1000 * 24 * 60 * 60;
         long nh = 1000 * 60 * 60;
-        long nm = 1000 * 60;
 
         if (faceList.size()==0||userList.size()==0)
             return "没有检测到人脸或者无用户face_token";
@@ -123,45 +124,33 @@ public class UserController {
                 if (userList.get(j).getUserFaceToken()==null){
                     continue;
                 }
-                boolean isExit=FaceUtil.compare(userList.get(j).getUserFaceToken(),faceList.get(i));
-                if(isExit){
-                    //推送内容
-                    Userinfo user = userList.get(j);
-                    Date Recognize_time1 = user.getUserRecognize();
-                    Date Recognize_time2 = new Date();
-                    if (Recognize_time1 != null){
-                        // 获得两个时间的毫秒时间差异
-                        long diff = Math.abs(Recognize_time1.getTime() - Recognize_time2.getTime());
-                        // 计算差多少天
-                        long day = diff / nd;
-                        // 计算差多少小时
-                        long hour = diff % nd / nh;
-                        if (day == 0){
-                            if (hour < 1){
-                                System.out.println("还不到一个小时,无法进行推送");
-                                return "还不到一个小时,无法进行推送";
-                            }
+                //推送内容
+                Userinfo user = userList.get(j);
+                Date Recognize_time1 = user.getUserRecognize();
+                Date Recognize_time2 = new Date();
+                if (Recognize_time1 != null){
+                    // 获得两个时间的毫秒时间差异
+                    long diff = Math.abs(Recognize_time1.getTime() - Recognize_time2.getTime());
+                    // 计算差多少天
+                    long day = diff / nd;
+                    // 计算差多少小时
+                    long hour = diff % nd / nh;
+                    if (day == 0){
+                        if (hour < 1){
+                            return "还不到一个小时,无法进行推送";
                         }
                     }
-                    //更新记录时间
-                    user.setUserRecognize(new Date());
+                }
+                //更新记录时间
+                user.setUserRecognize(new Date());
+                boolean isExit=FaceUtil.compare(userList.get(j).getUserFaceToken(),faceList.get(i));
+                if(isExit){
                     userinfoService.UpdateByPrimaryKeySelective(user);
                     //触发推送
-//                    map=recommendUtil.recommend_score(userList.get(j).getUserId());
-//                    JSONObject JSONmap = new JSONObject(map);
-//                    HttpTest.appadd(JSONmap);
-                   // String transJson = JSONmap.toString();
-//                    String result = OkHttpUtil.postJsonParams("http://47.101.179.98/wechat/returnpost2",transJson);
-//                    String result = OkHttpUtil.postJsonParams("http://localhost:8081/demo2/demo",transJson);
-//                    String str = OkHttpUtil.doPostHttpRequest("http://localhost:8081/demo2/demo", map.toString());
-//                    String json = JSON.toJSONString(map,true);
-//                    com.alibaba.fastjson.JSONObject ob = JSON.parseObject(json);
-                    //System.out.println(JSONmap);
-                    //System.out.println(transJson);
-                    System.out.println("------------------");
-//                    System.out.println("retuenstr:"+str);
-//                    System.out.println("retuenstr:"+retuenstr.toString());
-                    System.out.println("------------------");
+                    map=recommendUtil.recommend_score(userList.get(j).getUserId());
+                    map.put("openid",user.getUserOpenid());
+                    JSONObject JSONmap = new JSONObject(map);
+                    HttpTest.appadd(JSONmap);
                 }
             }
         }
@@ -228,11 +217,6 @@ public class UserController {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date birthday_date = sdf.parse(birthday);
 
-//            Calendar c = Calendar.getInstance();
-//            c.setTime(birthday_date);
-//            c.add(Calendar.DAY_OF_MONTH, 1);
-//            birthday_date = c.getTime();
-
             int user_year = Integer.parseInt(birthday.substring(0,4));
             int year = date.getYear()+1900;
             int age = year - user_year + 1;
@@ -267,24 +251,20 @@ public class UserController {
         return "失败";
     }
 
-    @RequestMapping("GetIllnessData")
-    public List<Illness> GetIllnessData(){
-        return illnessService.SelectAll();
-    }
-
-    @RequestMapping("GetOccupation")
-    public List<Occupation> GetOccupation(){
-        return occupationService.SelectAll();
-    }
-
     @RequestMapping(value = "insertUser",method = RequestMethod.POST)
-    public int insertUser(@RequestParam("openid") String openid)
-    {
+    public int insertUser(@RequestParam("openid") String openid) throws ParseException {
         Userinfo user = userinfoService.SelectByOpenid(openid);
         if (user == null)
         {
+            Calendar calendar = Calendar.getInstance();
+            /* HOUR_OF_DAY 指示一天中的小时 */
+            calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) - 2);
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Userinfo new_user = new Userinfo();
             new_user.setUserOpenid(openid);
+            String dd = df.format(calendar.getTime());
+            Date date = df.parse(dd);
+            new_user.setUserRecognize(date);
             userinfoService.insert(new_user);
             return 0;
         }else
@@ -675,13 +655,6 @@ public class UserController {
             List<String> LikeList1 = new ArrayList<>();
             List<String> LikeList2 = new ArrayList<>();
 
-//            System.out.println("里面的键值对是：");
-//            Set<Map.Entry<String, String>> set = MeatMap.entrySet();
-//            Iterator<Map.Entry<String, String>> iterator2 = set.iterator();
-//            while (iterator2.hasNext()) {
-//                Map.Entry<String, String> entry = iterator2.next();
-//                System.out.println("键是：" + entry.getKey() + "值是：" + entry.getValue());
-//            }
             int VMchoose = 0;
 
             if (VegetableMap.size() == 0 && MeatMap.size() == 0){
@@ -821,8 +794,6 @@ public class UserController {
                 tage_vitamin_B_2 = Double.valueOf(tage_vitamin_B_2str);
             }
             //维生素C
-//            System.out.println(All_vitamin_C/All_vitamin_C2);
-//            System.out.println();
             double tage_vitamin_C = 0;
             if (All_vitamin_C == 0){
                 tage_vitamin_C = -100;
@@ -1106,35 +1077,15 @@ public class UserController {
     }
 
     @Test
-    public void aaaa(){
-        String dou = "2755.55";
-        double dd = Double.parseDouble(dou);
-        double dd2 = Double.valueOf(dou);
-        System.out.println(dd2);
-        System.out.println(dd);
-//        Date now_date = new Date();
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        try {
-//
-//            Date ThisWeeklyDate;
-//            Date LastWeeklyDate;
-//            if (now_date.compareTo(getThisWeekMonday(now_date)) == -1){
-//                ThisWeeklyDate = geLastWeekMonday(now_date);
-//                LastWeeklyDate = geLLastWeekMonday(now_date);
-//            }else{
-//                ThisWeeklyDate = getThisWeekMonday(now_date);
-//                LastWeeklyDate = geLastWeekMonday(now_date);
-//            }
-//            String ThisWeeklyDate_Str = sdf.format(ThisWeeklyDate) + " 08:00:00";
-//            String LastWeeklyDate_Str = sdf.format(LastWeeklyDate) + " 08:00:00";
-//
-//            System.out.println("本周一" + ThisWeeklyDate_Str);
-//            System.out.println("上周一" + LastWeeklyDate_Str);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    public void aaaa() throws JSONException {
+        Calendar calendar = Calendar.getInstance();
+/* HOUR_OF_DAY 指示一天中的小时 */
+calendar.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY) - 1);
+SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//System.out.println("一个小时前的时间：" + );
+        String dd = df.format(calendar.getTime());
+System.out.println("当前的时间：" + df.format(new Date()));
+
     }
 
 }

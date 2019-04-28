@@ -1,6 +1,7 @@
 package cn.cch.healthy.dao;
 
 import cn.cch.healthy.model.SetmealInfomation;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface SetmealInfomationMapper {
 
     int updateByPrimaryKey(SetmealInfomation record);
 
-    List selectByTime(int rightTime,int num);
+    List selectByTime(@Param("rightTime") int rightTime, @Param("num") int num);
 
     String findSMnameByPrimaryKey(int smId);
 
