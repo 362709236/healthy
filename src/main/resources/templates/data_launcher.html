@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据发射器</title>
+    <script type="text/javascript" src="/static/js/jquery-3.3.1.min.js"></script>
+    <script>
+        function sendData() {
+            var userId = $('#userId').val()
+            $.ajax
+            ({
+                url:"test2",
+                method:"post",
+                data:
+                    {
+                        userId:userId
+                    },
+                success:function (data) {
+                    alert(data);
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+<form>
+    <table border="1">
+        <tr>
+            <th colspan="4" align="center">饮食推送测试器</th>
+        </tr>
+        <tr align="center">
+            <td colspan="2">用户ID</td>
+            <td colspan="2">就餐时间</td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="text" id="userId" name="userId"></td>
+            <td colspan="2"><input type="text" id="time" name="time"></td>
+        </tr>
+        <tr>
+            <td colspan="4" align="center"><input type="button" onclick="sendData()" value="发射"></td>
+        </tr>
+        <tr>
+            <td align="center">套餐号</td>
+            <td align="center">菜品一</td>
+            <td align="center">菜品二</td>
+            <td align="center">菜品三</td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

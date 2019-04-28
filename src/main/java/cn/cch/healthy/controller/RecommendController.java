@@ -9,6 +9,7 @@ import cn.cch.healthy.util.RecommendUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -39,32 +40,18 @@ public class RecommendController {
     /*
     * 描述：测试接口
     * */
-    @ResponseBody
-    @RequestMapping(value = "/test",method = RequestMethod.POST)
-    public Map test(@RequestParam("userId") String userId) throws Exception {
-        //List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(2);
-
-        return recommendUtil.recommend_score(Integer.parseInt(userId));
+    @RequestMapping(value = "/test2",method = RequestMethod.POST)
+    public String test2(@RequestParam("userId") String userId, Model model) throws Exception {
+        List<List> setmealList = (List<List>) recommendUtil.recommend_score(Integer.parseInt(userId)).get("recipes");
+        model.addAttribute("setmeals",setmealList);
+        return "data_launcher";
     }
     /*
     * 测试接口
     * */
     @ResponseBody
-    @RequestMapping("/test2")
-    public List<Map> test2() throws Exception {
-        List<SetmealInfomation> setMealList = setmealInfomationService.SelectByTime(2,30);
-        List<Adward> adwards = new ArrayList<Adward>();
-        List list=new ArrayList();
-        //设置奖品的名称(套餐id)和权重
-        for(int i=0;i<setMealList.size();i++)
-        {
-            Adward adward = new Adward(setMealList.get(i).getSmId());
-            adwards.add(adward);
-            adward.setRecipeList(setMealService.selectRecipeId(setMealList.get(i).getSmId()));
-        }
-        AdwardUtil adwardUtil = new AdwardUtil();
-        List<Map> records = dietRecordService.selectRecentRecord(1, 3, 2);
-        adwards=adwardUtil.balanceWeight(records,adwards);
-        return records;
+    @RequestMapping(value = "/test",method = RequestMethod.POST)
+    public Map test(@RequestParam("userId") String userId, Model model) throws Exception {
+        return recommendUtil.recommend_score(Integer.parseInt(userId));
     }
 }
