@@ -65,5 +65,7 @@ public class InterestService {
 
     public int DeleteByUserInterest(UserInterest UI){ return  userInterestMapper.deleteByUserInterest(UI); }
 
+    public Interest SelectByPrimaryKey(int id){ return mapper.selectByPrimaryKey(id); }
+
     public int insertSetmealIntest(Setmeal_Interest setmeal_interest){return setmeal_interestMapper.insert(setmeal_interest);}
 }

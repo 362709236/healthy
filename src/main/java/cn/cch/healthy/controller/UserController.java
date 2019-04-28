@@ -173,24 +173,41 @@ public class UserController {
         System.out.println("进入获取信息控制器");
         Userinfo user= userinfoService.SelectByOpenid(openid);
         int user_id = user.getUserId();
-        List<UserIllness> UIlist = userIllnessService.SelectByUserid(user_id);
+        List<Integer> UIlist = userIllnessService.SelectByUserid(user_id);
         List<String> IllnameList = new ArrayList<String>();
         if (UIlist.size() != 0){
             for (int i = 0;i<UIlist.size();i++){
-                int ill_id = UIlist.get(i).getIllId();
+                int ill_id = UIlist.get(i);
                 Illness ill = illnessService.SelectByPrimaryKey(ill_id);
                 String ill_name = ill.getIllName();
                 IllnameList.add(ill_name);
             }
         }
 
+        List<String> InterestNameList = new ArrayList<String>();
+        List<Integer> UINlist = interestService.SelectByUserId(user_id);
+        if (UINlist.size() != 0){
+            for (int i = 0;i<UINlist.size();i++){
+                Interest interest = interestService.SelectByPrimaryKey(UINlist.get(i));
+                String InterestName = interest.getInterestName();
+                InterestNameList.add(InterestName);
+            }
+        }
+
         HashMap<String, Object> map=new HashMap<String, Object>();
-        map.put("userName",user.getUserName());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        if (user.getUserBirthday() != null){
+            String birthday = sdf.format(user.getUserBirthday());
+            map.put("userBirthday",birthday);
+        }
+
         map.put("userSex",user.getUserSex());
-        map.put("userBirthday",user.getUserBirthday());
         map.put("userHeight",user.getUserHeight());
         map.put("userWeight",user.getUserWeight());
         map.put("userCcupation",user.getUserCcupation());
+        map.put("userType",user.getUserType());
+        map.put("userNumber",user.getUserNumber());
+        map.put("userInterests",InterestNameList);
         map.put("userIllness",IllnameList);
 
         return map;
@@ -200,20 +217,21 @@ public class UserController {
     public String UpdateUserinfo(@RequestParam("openid") String openid,
                                  @RequestParam("usersex") String sex,@RequestParam("userborn") String birthday,
                                  @RequestParam("userheight") String height_str,@RequestParam("userweight") String weight_str,
-                                 @RequestParam("occupation") String occupation,@RequestParam("userills")String Illness_Str) throws ParseException {
+                                 @RequestParam("occupation") String occupation,@RequestParam("userills")String Illness_Str,
+                                 @RequestParam("userinterests") String Interest_Str,@RequestParam("usernumber") String User_number,
+                                 @RequestParam("usertype") String User_type) throws ParseException {
         Userinfo user = userinfoService.SelectByOpenid(openid);
         System.out.println("进入修改信息控制器");
 
         if(!(birthday == null || birthday.equals(""))){
-            birthday = birthday.replace("/", "-");
             Date date = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date birthday_date = sdf.parse(birthday);
 
-            Calendar c = Calendar.getInstance();
-            c.setTime(birthday_date);
-            c.add(Calendar.DAY_OF_MONTH, 1);
-            birthday_date = c.getTime();
+//            Calendar c = Calendar.getInstance();
+//            c.setTime(birthday_date);
+//            c.add(Calendar.DAY_OF_MONTH, 1);
+//            birthday_date = c.getTime();
 
             int user_year = Integer.parseInt(birthday.substring(0,4));
             int year = date.getYear()+1900;
@@ -222,7 +240,9 @@ public class UserController {
             user.setUserBirthday(birthday_date);
         }
 
+        user.setUserNumber(User_number);
         user.setUserSex(sex);
+        user.setUserType(User_type);
 
         if (!(height_str == null || height_str.equals(""))){
             double height = Double.valueOf(height_str);
@@ -237,6 +257,7 @@ public class UserController {
         int user_id = user.getUserId();
 
         userConnentService.ConnectIllness(user_id,Illness_Str);
+        userConnentService.ConnectInterest(user_id,Interest_Str);
 
         int end = userinfoService.UpdateByPrimaryKeySelective(user);
 
@@ -256,83 +277,6 @@ public class UserController {
         return occupationService.SelectAll();
     }
 
-    /*@RequestMapping("GetUserNutrition")
-    public HashMap GetUserNutrition(@RequestParam("openid") String openid,@RequestParam("date") String date){
-        System.out.println(date);
-        Userinfo user = userinfoService.SelectByOpenid(openid);
-        if (user == null){
-            Userinfo new_user = new Userinfo();
-            new_user.setUserOpenid(openid);
-            new_user.setUserName("用户");
-            userinfoService.insert(new_user);
-            user = userinfoService.SelectByOpenid(openid);
-        }
-
-        int user_id = user.getUserId();
-        List<DietRecord> DRlist = dietRecordService.SelectByDate(date,user_id);
-
-        if (DRlist.size() != 0){
-            //营养含量值
-            double Food_fat = 0;
-            double Food_protein = 0;
-            double Food_energy = 0;
-            double Food_vitamin_A = 0;
-            double Food_vitamin_B_1 = 0;
-            double Food_vitamin_B_2 = 0;
-            double Food_vitamin_C = 0;
-            double Food_vitamin_E = 0;
-            double Food_Ca = 0;
-            double Food_Mg = 0;
-            double Food_Fe = 0;
-            double Food_Zn = 0;
-            double Food_cholesterol = 0;
-
-            for (int i = 0;i<DRlist.size();i++){
-                int DR_id = DRlist.get(i).getDrId();
-                List<Integer> RecipesList = dietRecordService.SelectByDRid(DR_id);
-                for (int j = 0;j<RecipesList.size();j++){
-                    int Recipes_id = RecipesList.get(j);
-                    List<FoodFormula> foodFormulaList = foodFormulaService.SelectByRecipesId(Recipes_id);
-                    for (int n = 0;n<foodFormulaList.size();n++){
-                        int Foodid = foodFormulaList.get(n).getFoodId();
-                        double Foodnumber = foodFormulaList.get(n).getFoodNumber();
-                        Food food = foodService.selectByPrimaryKey(Foodid);
-                        //计算套餐营养含量
-                        Food_fat += food.getFoodFat()*9*Foodnumber/3;
-                        Food_protein += food.getFoodProtein()*Foodnumber/3;
-                        Food_energy += food.getFoodEnergy()*Foodnumber/3;
-                        Food_vitamin_A += food.getFoodVitaminA()*Foodnumber/3;
-                        Food_vitamin_B_1 += food.getFoodVitaminB1()*Foodnumber/3;
-                        Food_vitamin_B_2 += food.getFoodVitaminB2()*Foodnumber/3;
-                        Food_vitamin_C += food.getFoodVitaminC()*Foodnumber/3;
-                        Food_vitamin_E += food.getFoodVitaminE()*Foodnumber/3;
-                        Food_Ca += food.getFoodCa()*Foodnumber/3;
-                        Food_Mg += food.getFoodMg()*Foodnumber/3;
-                        Food_Fe += food.getFoodFe()*Foodnumber/3;
-                        Food_Zn += food.getFoodZn()*Foodnumber/3;
-                        Food_cholesterol += food.getFoodCholesterol()*Foodnumber/3;
-                    }
-                }
-            }
-            HashMap map = new HashMap();
-            map.put("fat",Food_fat);
-            map.put("protein",Food_protein);
-            map.put("energy",Food_energy);
-            map.put("vitamin_A",Food_vitamin_A);
-            map.put("vitamin_B_1",Food_vitamin_B_1);
-            map.put("vitamin_B_2",Food_vitamin_B_2);
-            map.put("vitamin_C",Food_vitamin_C);
-            map.put("vitamin_E",Food_vitamin_E);
-            map.put("Ca",Food_Ca);
-            map.put("Mg",Food_Mg);
-            map.put("Fe",Food_Fe);
-            map.put("Zn",Food_Zn);
-            map.put("cholesterol",Food_cholesterol);
-            return map;
-        }else{
-            return null;
-        }
-    }*/
     @RequestMapping(value = "insertUser",method = RequestMethod.POST)
     public int insertUser(@RequestParam("openid") String openid)
     {
