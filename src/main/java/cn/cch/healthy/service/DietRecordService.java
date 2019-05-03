@@ -74,7 +74,10 @@ public class DietRecordService {
         return days;
     }
 
-    public List SelectByDate(String dateStr,int userId){ return mapper.selectByDate(dateStr,userId); }
+    public List SelectByDate(String dateStr,int userId,int time){
+        dateStr = "%"+dateStr+"%";
+        return mapper.selectByDate(dateStr,userId,time);
+    }
 
     public List SelectByDRid(int DR_id){ return subMapper.selectByDRid(DR_id); }
 

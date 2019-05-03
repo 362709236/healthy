@@ -22,4 +22,6 @@ public class UserinfoService {
     public List SelectAll(){ return mapper.selectAll(); }
 
     public Userinfo selectByPrimarykey(int userId){return mapper.selectByPrimaryKey(userId);}
+
+    public int updateByPrimaryKey(Userinfo user){ return mapper.updateByPrimaryKey(user); }
 }

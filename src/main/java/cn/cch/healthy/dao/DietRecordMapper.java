@@ -22,7 +22,7 @@ public interface DietRecordMapper {
 
     int updateByPrimaryKey(DietRecord record);
 
-    List selectByDate(@Param("dateStr") String dateStr,@Param("userId") int userId);
+    List selectByDate(@Param("dateStr") String dateStr,@Param("userId") int userId,@Param("time") int time);
 
     List selectAll();
 

@@ -513,6 +513,8 @@ public class CanteenControler {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));
         String datestr = sdf.format(date);
+        String datestr2 = datestr.substring(0,10);
+        System.out.println("datestr2:"+datestr2);
         System.out.println(datestr);
         int time = 0;
         if(date.getHours()>=0&&date.getHours()<10)
@@ -534,8 +536,8 @@ public class CanteenControler {
         int end1 = dietRecordService.insert(DR);
 
         if (end1 == 1){
-            List<DietRecord> DRlist = dietRecordService.SelectByDate(datestr,User_id);
-            int DR_id = DRlist.get(0).getDrId();
+            List<DietRecord> DRlist = dietRecordService.SelectByDate(datestr2,User_id,time);
+            int DR_id = DRlist.get(DRlist.size()-1).getDrId();
             int i = 0;
             while (i<RecipesArray.length){
                 DietRecord_Sub DRS = new DietRecord_Sub();

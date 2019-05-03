@@ -18,8 +18,8 @@
   </select>
 
   <select id="selectByDate" resultMap="BaseResultMap">
-    select * from dietrecord where DR_date = #{dateStr,jdbcType=VARCHAR}
-    and User_id = #{userId,jdbcType=INTEGER}
+    select * from dietrecord where DR_date like #{dateStr,jdbcType=VARCHAR}
+    and User_id = #{userId,jdbcType=INTEGER} and DR_time = #{time,jdbcType=INTEGER}
   </select>
 
   <select id="selectAll" resultMap="BaseResultMap">

@@ -147,7 +147,7 @@ public class UserController {
                 if(isExit){
                     userinfoService.UpdateByPrimaryKeySelective(user);
                     //触发推送
-                    map=recommendUtil.recommend_score(userList.get(j).getUserId());
+                    map=recommendUtil.recommend_score(userList.get(j).getUserId(),50);
                     map.put("openid",user.getUserOpenid());
                     JSONObject JSONmap = new JSONObject(map);
                     HttpTest.appadd(JSONmap);
@@ -222,20 +222,36 @@ public class UserController {
             int age = year - user_year + 1;
             user.setUserAge(age);
             user.setUserBirthday(birthday_date);
+        }else{
+            user.setUserAge(null);
+            user.setUserBirthday(null);
         }
 
+        if (User_number.equals(""))
+            user.setUserNumber(null);
         user.setUserNumber(User_number);
+        if (sex.equals(""))
+            user.setUserSex(null);
         user.setUserSex(sex);
+        if (User_type.equals(""))
+            user.setUserType(null);
         user.setUserType(User_type);
 
         if (!(height_str == null || height_str.equals(""))){
             double height = Double.valueOf(height_str);
             user.setUserHeight(height);
+        }else{
+            user.setUserHeight(null);
         }
         if (!(weight_str == null || weight_str.equals(""))){
             double weight = Double.valueOf(weight_str);
             user.setUserWeight(weight);
+        }else{
+            user.setUserWeight(null);
         }
+
+        if (occupation.equals(""))
+            user.setUserCcupation(null);
         user.setUserCcupation(occupation);
 
         int user_id = user.getUserId();
@@ -243,7 +259,7 @@ public class UserController {
         userConnentService.ConnectIllness(user_id,Illness_Str);
         userConnentService.ConnectInterest(user_id,Interest_Str);
 
-        int end = userinfoService.UpdateByPrimaryKeySelective(user);
+        int end = userinfoService.updateByPrimaryKey(user);
 
         if (end == 1){
             return "成功";
@@ -363,17 +379,19 @@ public class UserController {
         Userinfo user = userinfoService.SelectByOpenid(openid);
         int user_id = user.getUserId();
         List<DietRecord> DRlist = dietRecordService.SelectUserWeekDiet(user_id);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<HashMap> resultList = new ArrayList<>();
         int i = 0;
         while (i<DRlist.size()){
             HashMap map = new HashMap();
-            map.put("diettime",DRlist.get(i).getDrDate());
+            String datestr = sdf.format(DRlist.get(i).getDrDate());
+            map.put("diettime",datestr);
             int DR_id = DRlist.get(i).getDrId();
             List<Integer> DRSlist = dietRecordService.SelectByDRid(DR_id);
             List<Recipes> recipesList = new ArrayList<Recipes>();
             int j = 0;
             while (j < DRSlist.size()){
-                Recipes recipes = recipesService.SelectByPrimaryKey(DRSlist.get(i));
+                Recipes recipes = recipesService.SelectByPrimaryKey(DRSlist.get(j));
                 recipesList.add(recipes);
                 j++;
             }
@@ -1086,6 +1104,11 @@ SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dd = df.format(calendar.getTime());
 System.out.println("当前的时间：" + df.format(new Date()));
 
+    }
+
+    @RequestMapping("aa")
+    public void aa(@RequestParam("heigt") String height,@RequestParam("openid") String openid){
+//        if (height.equals(""))
     }
 
 }

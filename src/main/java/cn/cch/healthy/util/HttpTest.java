@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class HttpTest {
 //    public static final String ADD_URL = "http://localhost:8081/demo2/demo";
 //    http://47.101.179.98/wechat/returnpost2
-    public static final String ADD_URL = "http://47.101.179.98/wechat/send";
+    public static final String ADD_URL = "https://doodoodoo.cn/wechat/send";
     //   public static final String ADD_URL = "http://192.168.4.97:35357/v2.0/tokens";
     public static void appadd(JSONObject json) throws IOException {
         System.out.println("json："+json);
