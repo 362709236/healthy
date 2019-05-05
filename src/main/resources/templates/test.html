@@ -112,10 +112,20 @@
          //        type: 'POST',
          //        data: info,
          //        dataType: "json",
-
-         //        success: function (returndata) {
-         //            alert(returndata)
-
+         //
+         //        success: function (res) {
+         //            var code = res.get("错误码");
+         //            if (code == 400){
+         //                alert("该用户没有饮食记录,无法生成周报");
+         //            } else if (code == 401){
+         //                alert("用户信息不全(出生日期、性别、职业),请填写完整,否则无法生成周报")
+         //            } else if (code == 402){
+         //                alert("用户身高或体重数据错误,请重新填写")
+         //            } else if (code == 404){
+         //                alert("用户不存在,请先注册进行绑定");
+         //            } else if (code == 200){
+         //                alert("成功");
+         //            }
          //        },
          //        error: function (returndata) {
          //            alert(returndata);
